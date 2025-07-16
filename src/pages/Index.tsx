@@ -5,11 +5,28 @@ import { ConnectButton } from '@rainbow-me/rainbowkit';
 import { Search, ExternalLink, Twitter, Send, MessageCircle, Globe } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { formatDomain, isValidFullDomain, hasBannedWords, extractDomainName } from '../lib/domain-utils';
-import pepeIcon from '../assets/pepe-icon.png';
 
-const FLOATING_DOMAINS = [
-  'crypto.pepu', 'moon.pepu', 'frog.pepu', 'meme.pepu', 'defi.pepu', 'web3.pepu'
-];
+// Generate many floating domain names
+const generateFloatingDomains = () => {
+  const prefixes = [
+    'crypto', 'moon', 'frog', 'meme', 'defi', 'web3', 'nft', 'dao', 'dex', 'yield',
+    'stake', 'farm', 'mint', 'burn', 'swap', 'pool', 'whale', 'ape', 'diamond', 'hodl',
+    'bull', 'bear', 'pump', 'dump', 'rekt', 'fomo', 'yolo', 'alpha', 'beta', 'gamma',
+    'token', 'coin', 'chain', 'block', 'hash', 'node', 'peer', 'sync', 'fork', 'merge',
+    'layer', 'cross', 'bridge', 'wrap', 'unwrap', 'lock', 'unlock', 'claim', 'reward', 'bonus',
+    'rare', 'epic', 'legend', 'ultra', 'super', 'mega', 'giga', 'tera', 'peta', 'quantum',
+    'cyber', 'neural', 'matrix', 'pixel', 'retro', 'neo', 'hyper', 'ultra', 'prime', 'omega',
+    'storm', 'thunder', 'lightning', 'fire', 'ice', 'water', 'earth', 'wind', 'void', 'light',
+    'dark', 'shadow', 'bright', 'shine', 'glow', 'spark', 'flash', 'beam', 'ray', 'wave',
+    'flow', 'stream', 'river', 'ocean', 'sea', 'lake', 'pond', 'pool', 'drop', 'bubble'
+  ];
+  
+  return Array.from({ length: 100 }, (_, i) => 
+    `${prefixes[Math.floor(Math.random() * prefixes.length)]}.pepu`
+  );
+};
+
+const FLOATING_DOMAINS = generateFloatingDomains();
 
 const Index = () => {
   const { address, isConnected } = useAccount();
@@ -140,12 +157,17 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background relative overflow-hidden">
-      {/* Floating domains */}
+      {/* Floating domains - many more now */}
       {FLOATING_DOMAINS.map((domain, index) => (
         <div
-          key={domain}
-          className={`floating-domain floating-domain-${index + 1}`}
-          style={{ animationDelay: `${index * -3}s` }}
+          key={`${domain}-${index}`}
+          className="absolute text-sm font-medium text-primary/10 pointer-events-none select-none animate-float"
+          style={{
+            top: `${Math.random() * 100}%`,
+            left: `${Math.random() * 100}%`,
+            animationDelay: `${Math.random() * 20}s`,
+            animationDuration: `${15 + Math.random() * 10}s`
+          }}
         >
           {domain}
         </div>
@@ -155,7 +177,7 @@ const Index = () => {
       <header className="relative z-10 p-6">
         <div className="max-w-6xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <img src={pepeIcon} alt="Pepu" className="w-10 h-10" />
+            <img src="/lovable-uploads/b5d6c723-1457-4e7f-b1f8-8ae362517495.png" alt="Pepu" className="w-10 h-10" />
             <h1 className="text-2xl font-bold text-primary">Pepu Name Service</h1>
           </div>
           <ConnectButton />
@@ -218,21 +240,25 @@ const Index = () => {
             </div>
           </div>
 
-          {/* Stats section */}
-          <div className="glass-card p-6 max-w-md mx-auto">
-            <div className="text-center">
-              <div className="text-3xl font-bold text-primary">
-                {domainCount} / 1,000
+          {/* Stats section - improved styling */}
+          <div className="text-center">
+            <div className="inline-flex items-center gap-4 px-8 py-4 rounded-full bg-gradient-to-r from-primary/10 to-secondary/10 border border-primary/20">
+              <div className="text-4xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+                {domainCount}
               </div>
-              <div className="text-muted-foreground">
-                Domains registered
+              <div className="text-2xl text-muted-foreground">/</div>
+              <div className="text-4xl font-bold text-muted-foreground">
+                1,000
               </div>
-              {domainCount < 1000 && (
-                <div className="text-sm status-discount mt-2">
-                  🔥 Discount price: Only {1000 - domainCount} left!
-                </div>
-              )}
+              <div className="text-sm text-muted-foreground ml-2">
+                domains registered
+              </div>
             </div>
+            {domainCount < 1000 && (
+              <div className="text-sm status-discount mt-3">
+                🔥 Discount price: Only {1000 - domainCount} left!
+              </div>
+            )}
           </div>
 
           {/* Owned domain display */}
@@ -245,15 +271,14 @@ const Index = () => {
             </div>
           )}
 
-          {/* Registration section */}
+          {/* Registration section - removed ConnectButton */}
           {!isConnected ? (
             <div className="glass-card p-8 max-w-md mx-auto text-center">
               <div className="space-y-4">
                 <h3 className="text-xl font-semibold">Ready to claim your domain?</h3>
                 <p className="text-muted-foreground">
-                  Connect your wallet to register a .pepu domain
+                  Connect your wallet using the button in the top right to register a .pepu domain
                 </p>
-                <ConnectButton />
               </div>
             </div>
           ) : isLimitReached ? (
