@@ -1,8 +1,9 @@
+
 import { useState, useEffect } from 'react';
 import { useAccount } from 'wagmi';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
 import { Search, ExternalLink, Twitter, Send, MessageCircle, Globe } from 'lucide-react';
-import { supabase, type Domain } from '../lib/supabase';
+import { supabase } from '@/integrations/supabase/client';
 import { formatDomain, isValidFullDomain, hasBannedWords, extractDomainName } from '../lib/domain-utils';
 import pepeIcon from '../assets/pepe-icon.png';
 
@@ -47,9 +48,9 @@ const Index = () => {
         .select('name')
         .eq('owner', address.toLowerCase())
         .eq('paid', true)
-        .single();
+        .maybeSingle();
       
-      if (error && error.code !== 'PGRST116') throw error;
+      if (error) throw error;
       setOwnedDomain(data?.name || null);
     } catch (err) {
       console.error('Error fetching owned domain:', err);
@@ -90,9 +91,9 @@ const Index = () => {
         .select('name')
         .eq('name', fullDomain)
         .eq('paid', true)
-        .single();
+        .maybeSingle();
       
-      if (error && error.code !== 'PGRST116') throw error;
+      if (error) throw error;
       
       if (data) {
         setAvailability('Domain is taken');
