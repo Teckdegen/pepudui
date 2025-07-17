@@ -8,7 +8,7 @@ interface PaymentVerificationProps {
   onError: (error: string) => void;
 }
 
-const TREASURY_WALLET = '0xTreasuryPEPU...'; // Replace with actual treasury wallet
+const TREASURY_WALLET = '0x742d35Cc6635C0532925a3b8D17Cc6b9fdc7';
 const PEPU_USDC_AMOUNT = '5'; // 5 USDC
 
 export const PaymentVerification = ({ 
@@ -22,7 +22,7 @@ export const PaymentVerification = ({
 
   const verifyPayment = async () => {
     setIsVerifying(true);
-    setPaymentStatus('Waiting for payment...');
+    setPaymentStatus('Checking for payment...');
 
     try {
       const response = await fetch('/api/verify-payment', {
@@ -42,7 +42,7 @@ export const PaymentVerification = ({
         setPaymentStatus('Payment confirmed! Domain registered.');
         onSuccess();
       } else {
-        setPaymentStatus(`Payment verification failed: ${result.error}`);
+        setPaymentStatus(`Verification failed: ${result.error}`);
         onError(result.error);
       }
     } catch (error) {
@@ -55,15 +55,15 @@ export const PaymentVerification = ({
   };
 
   return (
-    <div className="bg-white/20 backdrop-blur-sm border border-white/30 rounded-3xl p-8">
+    <div className="bg-white border border-gray-200 rounded-3xl p-8 shadow-xl">
       <div className="space-y-6">
-        <h3 className="text-xl font-semibold text-white">Complete Your Payment</h3>
+        <h3 className="text-xl font-semibold text-gray-800">Complete Your Payment</h3>
         
-        <div className="space-y-4 text-white/80">
-          <p>To register <span className="text-yellow-300 font-medium">{domainName}</span>:</p>
+        <div className="space-y-4 text-gray-600">
+          <p>To register <span className="text-yellow-500 font-medium">{domainName}</span>:</p>
           <ol className="list-decimal list-inside space-y-2">
-            <li>Send exactly <span className="text-yellow-300 font-medium">${PEPU_USDC_AMOUNT} USDC</span> to:</li>
-            <li className="text-sm font-mono bg-white/10 p-2 rounded break-all">
+            <li>Send exactly <span className="text-yellow-500 font-medium">${PEPU_USDC_AMOUNT} USDC</span> to:</li>
+            <li className="text-sm font-mono bg-gray-100 p-3 rounded break-all border">
               {TREASURY_WALLET}
             </li>
             <li>Click "Verify Payment" below</li>
@@ -81,16 +81,16 @@ export const PaymentVerification = ({
         {paymentStatus && (
           <div className={`text-center p-3 rounded-xl ${
             paymentStatus.includes('confirmed') 
-              ? 'bg-green-500/20 text-green-300' 
+              ? 'bg-green-100 text-green-700 border border-green-200' 
               : paymentStatus.includes('failed')
-              ? 'bg-red-500/20 text-red-300'
-              : 'bg-blue-500/20 text-blue-300'
+              ? 'bg-red-100 text-red-700 border border-red-200'
+              : 'bg-blue-100 text-blue-700 border border-blue-200'
           }`}>
             {paymentStatus}
           </div>
         )}
 
-        <p className="text-xs text-white/60 text-center">
+        <p className="text-xs text-gray-500 text-center">
           Payment verification can take up to 5 minutes. Please be patient.
         </p>
       </div>

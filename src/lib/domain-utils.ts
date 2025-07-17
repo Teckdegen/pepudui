@@ -1,3 +1,4 @@
+
 // Banned words that users cannot register
 export const BANNED_WORDS = [
   'pepeunchain', 'pepeunchaned', 'pepeunchanied', 'pepuunchianed', 'pepeunchiand', 
