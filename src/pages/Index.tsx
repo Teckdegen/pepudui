@@ -1,14 +1,13 @@
-
 import { useState, useEffect } from 'react';
 import { useAccount } from 'wagmi';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
-import { Search, ExternalLink, Twitter, Send, MessageCircle, Globe } from 'lucide-react';
+import { Search, ExternalLink, Twitter, Send, MessageCircle } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { formatDomain, isValidFullDomain, hasBannedWords, extractDomainName } from '../lib/domain-utils';
 import { PaymentVerification } from '../components/PaymentVerification';
 import { useToast } from '@/hooks/use-toast';
 
-// Generate many floating domain names (increased to make it feel like "a million")
+// Generate many more floating domain names for a very prominent background effect
 const generateFloatingDomains = () => {
   const prefixes = [
     'crypto', 'moon', 'frog', 'meme', 'defi', 'web3', 'nft', 'dao', 'dex', 'yield',
@@ -22,10 +21,25 @@ const generateFloatingDomains = () => {
     'dark', 'shadow', 'bright', 'shine', 'glow', 'spark', 'flash', 'beam', 'ray', 'wave',
     'flow', 'stream', 'river', 'ocean', 'sea', 'lake', 'pond', 'pool', 'drop', 'bubble',
     'pepe', 'pepeu', 'kek', 'based', 'cringe', 'cope', 'seethe', 'mald', 'wojak', 'chad',
-    'gigachad', 'sigma', 'beta', 'alpha', 'normie', 'coomer', 'doomer', 'boomer', 'zoomer'
+    'gigachad', 'sigma', 'beta', 'alpha', 'normie', 'coomer', 'doomer', 'boomer', 'zoomer',
+    'rocket', 'star', 'galaxy', 'cosmos', 'nebula', 'planet', 'asteroid', 'comet', 'lunar', 'solar',
+    'digital', 'virtual', 'augmented', 'reality', 'metaverse', 'avatar', 'hologram', 'portal', 'nexus', 'vortex',
+    'future', 'tomorrow', 'infinity', 'eternal', 'immortal', 'legendary', 'mythical', 'ancient', 'modern', 'classic',
+    'golden', 'silver', 'bronze', 'platinum', 'crystal', 'emerald', 'ruby', 'sapphire', 'diamond', 'obsidian',
+    'ninja', 'samurai', 'warrior', 'knight', 'wizard', 'mage', 'sorcerer', 'dragon', 'phoenix', 'griffin',
+    'thunder', 'storm', 'blizzard', 'hurricane', 'tornado', 'earthquake', 'volcano', 'tsunami', 'avalanche', 'meteor',
+    'cyber', 'tech', 'digital', 'binary', 'code', 'data', 'network', 'server', 'cloud', 'ai',
+    'robot', 'android', 'cyborg', 'machine', 'automation', 'algorithm', 'protocol', 'framework', 'system', 'platform',
+    'universe', 'multiverse', 'dimension', 'timeline', 'parallel', 'quantum', 'particle', 'atom', 'molecule', 'electron',
+    'photon', 'neutron', 'proton', 'energy', 'matter', 'antimatter', 'gravity', 'magnetism', 'electricity', 'frequency',
+    'vibration', 'resonance', 'harmony', 'symphony', 'melody', 'rhythm', 'beat', 'tempo', 'music', 'sound',
+    'vision', 'dream', 'imagination', 'creativity', 'innovation', 'invention', 'discovery', 'exploration', 'adventure', 'journey',
+    'destiny', 'fate', 'fortune', 'luck', 'chance', 'probability', 'possibility', 'opportunity', 'moment', 'instant',
+    'forever', 'eternity', 'timeless', 'endless', 'infinite', 'boundless', 'limitless', 'countless', 'numerous', 'abundant'
   ];
   
-  return Array.from({ length: 300 }, (_, i) => 
+  // Generate 800 domain names for a very prominent background
+  return Array.from({ length: 800 }, (_, i) => 
     `${prefixes[Math.floor(Math.random() * prefixes.length)]}.pepu`
   );
 };
@@ -213,16 +227,18 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-white relative overflow-hidden">
-      {/* Floating domains - many more now */}
+      {/* Floating domains - much more prominent now with 800 domains */}
       {FLOATING_DOMAINS.map((domain, index) => (
         <div
           key={`${domain}-${index}`}
-          className="absolute text-xs md:text-sm font-medium text-blue-600/20 pointer-events-none select-none animate-float"
+          className="absolute text-xs md:text-sm lg:text-base font-medium text-blue-600/15 pointer-events-none select-none animate-float"
           style={{
             top: `${Math.random() * 100}%`,
             left: `${Math.random() * 100}%`,
             animationDelay: `${Math.random() * 20}s`,
-            animationDuration: `${15 + Math.random() * 10}s`
+            animationDuration: `${10 + Math.random() * 15}s`,
+            fontSize: `${0.75 + Math.random() * 0.5}rem`, // Random sizes for more variety
+            opacity: 0.1 + Math.random() * 0.2 // Varying opacity
           }}
         >
           {domain}
@@ -404,7 +420,7 @@ const Index = () => {
         </div>
       </main>
 
-      {/* Footer */}
+      {/* Footer - removed Discord and Website links */}
       <footer className="relative z-10 border-t border-gray-200 mt-20">
         <div className="max-w-4xl mx-auto px-6 py-12">
           <div className="text-center space-y-8">
@@ -428,24 +444,6 @@ const Index = () => {
               >
                 <Send className="w-5 h-5" />
                 Telegram
-              </a>
-              <a
-                href="https://discord.gg/pepeunchained"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-2 text-gray-600 hover:text-blue-600 transition-colors"
-              >
-                <MessageCircle className="w-5 h-5" />
-                Discord
-              </a>
-              <a
-                href="https://pepeunchained.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-2 text-gray-600 hover:text-blue-600 transition-colors"
-              >
-                <Globe className="w-5 h-5" />
-                Website
               </a>
             </div>
 
