@@ -1,6 +1,5 @@
 
 import { useState } from 'react';
-import { supabase } from '@/integrations/supabase/client';
 
 interface PaymentVerificationProps {
   walletAddress: string;
@@ -10,7 +9,7 @@ interface PaymentVerificationProps {
 }
 
 const TREASURY_WALLET = '0xTreasuryPEPU...'; // Replace with actual treasury wallet
-const PEPU_USDC_AMOUNT = '5000000000000000000'; // 5 USDC in wei
+const PEPU_USDC_AMOUNT = '5'; // 5 USDC
 
 export const PaymentVerification = ({ 
   walletAddress, 
@@ -63,7 +62,7 @@ export const PaymentVerification = ({
         <div className="space-y-4 text-white/80">
           <p>To register <span className="text-yellow-300 font-medium">{domainName}</span>:</p>
           <ol className="list-decimal list-inside space-y-2">
-            <li>Send exactly <span className="text-yellow-300 font-medium">$5 USDC</span> to:</li>
+            <li>Send exactly <span className="text-yellow-300 font-medium">${PEPU_USDC_AMOUNT} USDC</span> to:</li>
             <li className="text-sm font-mono bg-white/10 p-2 rounded break-all">
               {TREASURY_WALLET}
             </li>

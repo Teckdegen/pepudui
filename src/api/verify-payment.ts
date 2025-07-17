@@ -3,7 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 
 const TREASURY_WALLET = '0xTreasuryPEPU...'; // Replace with actual treasury wallet
 const PEPU_RPC_URL = 'https://rpc-pepu-v2-mainnet-0.t.conduit.xyz';
-const REQUIRED_AMOUNT = '5000000000000000000'; // 5 USDC in wei
+const REQUIRED_AMOUNT = '5000000000000000000'; // 5 USDC in wei (assuming 18 decimals)
 const POLLING_INTERVAL = 15000; // 15 seconds
 const MAX_POLLING_TIME = 300000; // 5 minutes
 
@@ -34,11 +34,15 @@ async function callPepuRPC(method: string, params: any[] = []) {
   return data.result;
 }
 
-async function getTransactionsByAddress(address: string): Promise<Transaction[]> {
-  // This would depend on the specific RPC methods available
-  // For now, we'll use a generic approach
+async function getLatestTransactions(address: string): Promise<Transaction[]> {
   try {
-    const transactions = await callPepuRPC('eth_getTransactionsByAddress', [address]);
+    // Get the latest block number
+    const latestBlock = await callPepuRPC('eth_blockNumber');
+    const startBlock = `0x${(parseInt(latestBlock, 16) - 1000).toString(16)}`; // Check last 1000 blocks
+    
+    // This is a simplified approach - in production you might need to use event logs or a different method
+    // depending on the specific RPC methods available on Pepu chain
+    const transactions = await callPepuRPC('eth_getTransactionsByAddress', [address, startBlock, latestBlock]);
     return transactions || [];
   } catch (error) {
     console.error('Error fetching transactions:', error);
@@ -67,7 +71,17 @@ async function verifyTransaction(txHash: string): Promise<Transaction | null> {
   return null;
 }
 
-async function sendTelegramNotification(wallet: string, name: string) {
+async function sendTelegramNotification(wallet: string, name: string, txHash: string) {
+  // Note: In a real implementation, these would be server-side environment variables
+  // For now, we'll just log the notification
+  console.log(`✅ New domain registered!
+Wallet: ${wallet}
+Domain: ${name}
+Transaction: ${txHash}
+Time: ${new Date().toISOString()}`);
+  
+  // Uncomment and configure when you have actual bot credentials
+  /*
   const botToken = process.env.TELEGRAM_BOT_TOKEN;
   const chatId = process.env.TELEGRAM_CHAT_ID;
   
@@ -76,9 +90,10 @@ async function sendTelegramNotification(wallet: string, name: string) {
     return;
   }
 
-  const message = `✅ New domain reserved!
+  const message = `✅ New domain registered!
 Wallet: ${wallet}
-Name: ${name}
+Domain: ${name} 
+Transaction: ${txHash}
 Time: ${new Date().toISOString()}`;
 
   try {
@@ -95,6 +110,7 @@ Time: ${new Date().toISOString()}`;
   } catch (error) {
     console.error('Error sending Telegram notification:', error);
   }
+  */
 }
 
 export async function POST(request: Request) {
@@ -135,7 +151,7 @@ export async function POST(request: Request) {
 
     while (Date.now() - startTime < MAX_POLLING_TIME && !paymentFound) {
       try {
-        const transactions = await getTransactionsByAddress(wallet);
+        const transactions = await getLatestTransactions(wallet);
         
         for (const tx of transactions) {
           if (
@@ -160,7 +176,7 @@ export async function POST(request: Request) {
             }
 
             // Send Telegram notification
-            await sendTelegramNotification(wallet, name);
+            await sendTelegramNotification(wallet, name, tx.hash);
 
             return Response.json({ success: true, name, txHash: tx.hash });
           }

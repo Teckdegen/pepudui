@@ -5,6 +5,8 @@ import { ConnectButton } from '@rainbow-me/rainbowkit';
 import { Search, ExternalLink, Twitter, Send, MessageCircle, Globe } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { formatDomain, isValidFullDomain, hasBannedWords, extractDomainName } from '../lib/domain-utils';
+import { PaymentVerification } from '../components/PaymentVerification';
+import { useToast } from '@/hooks/use-toast';
 
 // Generate many floating domain names (increased to make it feel like "a million")
 const generateFloatingDomains = () => {
@@ -32,12 +34,15 @@ const FLOATING_DOMAINS = generateFloatingDomains();
 
 const Index = () => {
   const { address, isConnected } = useAccount();
+  const { toast } = useToast();
   const [searchQuery, setSearchQuery] = useState('');
   const [domainCount, setDomainCount] = useState(0);
   const [ownedDomain, setOwnedDomain] = useState<string | null>(null);
   const [availability, setAvailability] = useState<string>('');
   const [error, setError] = useState<string>('');
   const [isLoading, setIsLoading] = useState(false);
+  const [showPayment, setShowPayment] = useState(false);
+  const [selectedDomain, setSelectedDomain] = useState<string>('');
 
   // Fetch domain count from Supabase
   const fetchDomainCount = async () => {
@@ -118,6 +123,7 @@ const Index = () => {
         setAvailability('Domain is taken');
       } else {
         setAvailability('Domain is available! 🎉');
+        setSelectedDomain(fullDomain);
       }
     } catch (err) {
       console.error('Error checking availability:', err);
@@ -132,13 +138,60 @@ const Index = () => {
     setSearchQuery(value);
     setAvailability('');
     setError('');
+    setShowPayment(false);
   };
 
-  // Auto-add .pepu when user types
+  // Handle search keydown
   const handleSearchKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {
       checkAvailability();
     }
+  };
+
+  // Handle register domain
+  const handleRegister = () => {
+    if (!isConnected) {
+      toast({
+        title: "Wallet Required",
+        description: "Please connect your wallet to register a domain",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!selectedDomain) {
+      toast({
+        title: "No Domain Selected",
+        description: "Please search for and select an available domain first",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setShowPayment(true);
+  };
+
+  // Handle payment success
+  const handlePaymentSuccess = () => {
+    setShowPayment(false);
+    fetchDomainCount();
+    fetchOwnedDomain();
+    setSearchQuery('');
+    setAvailability('');
+    setSelectedDomain('');
+    toast({
+      title: "Registration Successful!",
+      description: `${selectedDomain} has been registered successfully`,
+    });
+  };
+
+  // Handle payment error
+  const handlePaymentError = (error: string) => {
+    toast({
+      title: "Registration Failed",
+      description: error,
+      variant: "destructive",
+    });
   };
 
   useEffect(() => {
@@ -156,6 +209,7 @@ const Index = () => {
 
   const isLimitReached = domainCount >= 1000;
   const hasOwnedDomain = ownedDomain !== null;
+  const canRegister = availability.includes('available') && selectedDomain && !hasOwnedDomain && !isLimitReached;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-600 via-blue-700 to-blue-800 relative overflow-hidden">
@@ -204,6 +258,26 @@ const Index = () => {
             </p>
           </div>
 
+          {/* Payment verification modal */}
+          {showPayment && (
+            <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+              <div className="max-w-md w-full">
+                <PaymentVerification
+                  walletAddress={address || ''}
+                  domainName={selectedDomain}
+                  onSuccess={handlePaymentSuccess}
+                  onError={handlePaymentError}
+                />
+                <button
+                  onClick={() => setShowPayment(false)}
+                  className="mt-4 w-full px-4 py-2 text-white/80 hover:text-white transition-colors"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          )}
+
           {/* Search section - main focus */}
           <div className="bg-white/95 backdrop-blur-sm rounded-3xl p-8 max-w-3xl mx-auto shadow-2xl">
             <div className="space-y-6">
@@ -242,6 +316,16 @@ const Index = () => {
               )}
 
               {error && <div className="text-red-600 font-medium">{error}</div>}
+
+              {/* Register button */}
+              {canRegister && (
+                <button
+                  onClick={handleRegister}
+                  className="w-full px-6 py-3 bg-yellow-500 text-black rounded-2xl hover:bg-yellow-400 transition-colors font-medium text-lg"
+                >
+                  Register for $5 USDC
+                </button>
+              )}
             </div>
           </div>
 
@@ -298,20 +382,7 @@ const Index = () => {
                 </p>
               </div>
             </div>
-          ) : (
-            <div className="bg-white/20 backdrop-blur-sm border border-white/30 rounded-3xl p-8 max-w-md mx-auto text-center">
-              <div className="space-y-4">
-                <h3 className="text-xl font-semibold text-white">🚧 Registration Coming Soon</h3>
-                <p className="text-white/80">
-                  RPC payment verification is being finalized. 
-                  You can check domain availability now!
-                </p>
-                <p className="text-yellow-300 font-medium">
-                  Get ready to register for just $5 USDC
-                </p>
-              </div>
-            </div>
-          )}
+          ) : null}
 
           {/* Info section */}
           <div className="bg-white/20 backdrop-blur-sm border border-white/30 rounded-3xl p-8 max-w-3xl mx-auto">
