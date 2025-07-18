@@ -10,7 +10,7 @@ interface PaymentVerificationProps {
   onError: (error: string) => void;
 }
 
-const TREASURY_WALLET = '0x742d35Cc6635C0532925a3b8D17Cc6b9fdc70000'; // Fixed - now 42 characters
+const TREASURY_WALLET = '0x5359d161d3cdBCfA6C38A387b7F685ebe354368f'; // Your correct treasury address
 const USDC_CONTRACT = '0xA0b86a33E6441b8435b662C0c5b90FdF0Be3D55b'; // USDC on Pepu chain
 const PEPU_USDC_AMOUNT = '5'; // 5 USDC
 
@@ -46,6 +46,9 @@ export const PaymentVerification = ({
     setPaymentStatus('Opening wallet for confirmation...');
 
     try {
+      console.log('Sending payment to treasury:', TREASURY_WALLET);
+      console.log('Amount:', PEPU_USDC_AMOUNT, 'USDC');
+      
       // Send USDC transfer transaction
       writeContract({
         address: USDC_CONTRACT as `0x${string}`,
@@ -82,12 +85,14 @@ export const PaymentVerification = ({
     if (hash) {
       setTxHash(hash);
       setPaymentStatus('Transaction sent! Waiting for confirmation...');
+      console.log('Transaction hash:', hash);
     }
   }, [hash]);
 
   useEffect(() => {
     if (isConfirmed && hash) {
       setPaymentStatus('Payment confirmed! Registering domain...');
+      console.log('Payment confirmed, verifying...');
       verifyPayment(hash);
     }
   }, [isConfirmed, hash]);
@@ -103,6 +108,10 @@ export const PaymentVerification = ({
 
   const verifyPayment = async (transactionHash: string) => {
     try {
+      console.log('Verifying payment with hash:', transactionHash);
+      console.log('Wallet:', walletAddress);
+      console.log('Domain:', domainName);
+      
       const response = await fetch('/api/verify-payment', {
         method: 'POST',
         headers: {
@@ -116,6 +125,7 @@ export const PaymentVerification = ({
       });
 
       const result = await response.json();
+      console.log('Verification result:', result);
 
       if (result.success) {
         setPaymentStatus('Domain registered successfully! 🎉');

@@ -1,33 +1,26 @@
+
 import { useState, useEffect } from 'react';
 import { useAccount } from 'wagmi';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
-import { Search, ExternalLink, Twitter, Send, Sparkles, Star } from 'lucide-react';
+import { Search, Sparkles, Star } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { formatDomain, isValidFullDomain, hasBannedWords, extractDomainName } from '../lib/domain-utils';
 import { PaymentVerification } from '../components/PaymentVerification';
 import { useToast } from '@/hooks/use-toast';
 
-// Generate many more floating domain names for a very prominent background effect
+// Generate floating domain names for background effect
 const generateFloatingDomains = () => {
   const prefixes = [
     'crypto', 'moon', 'frog', 'meme', 'defi', 'web3', 'nft', 'dao', 'dex', 'yield',
     'stake', 'farm', 'mint', 'burn', 'swap', 'pool', 'whale', 'ape', 'diamond', 'hodl',
     'bull', 'bear', 'pump', 'dump', 'rekt', 'fomo', 'yolo', 'alpha', 'beta', 'gamma',
     'token', 'coin', 'chain', 'block', 'hash', 'node', 'peer', 'sync', 'fork', 'merge',
-    'layer', 'cross', 'bridge', 'wrap', 'unwrap', 'lock', 'unlock', 'claim', 'reward', 'bonus',
-    'rare', 'epic', 'legend', 'ultra', 'super', 'mega', 'giga', 'tera', 'peta', 'quantum',
-    'cyber', 'neural', 'matrix', 'pixel', 'retro', 'neo', 'hyper', 'ultra', 'prime', 'omega',
-    'storm', 'thunder', 'lightning', 'fire', 'ice', 'water', 'earth', 'wind', 'void', 'light',
-    'dark', 'shadow', 'bright', 'shine', 'glow', 'spark', 'flash', 'beam', 'ray', 'wave',
-    'flow', 'stream', 'river', 'ocean', 'sea', 'lake', 'pond', 'pool', 'drop', 'bubble',
     'pepe', 'pepeu', 'kek', 'based', 'cringe', 'cope', 'seethe', 'mald', 'wojak', 'chad',
-    'gigachad', 'sigma', 'beta', 'alpha', 'normie', 'coomer', 'doomer', 'boomer', 'zoomer',
     'rocket', 'star', 'galaxy', 'cosmos', 'nebula', 'planet', 'asteroid', 'comet', 'lunar', 'solar',
-    'digital', 'virtual', 'augmented', 'reality', 'metaverse', 'avatar', 'hologram', 'portal', 'nexus', 'vortex'
+    'digital', 'virtual', 'augmented', 'reality', 'metaverse', 'avatar', 'hologram', 'portal', 'nexus'
   ];
   
-  // Generate 1000 domain names for a very prominent background
-  return Array.from({ length: 1000 }, (_, i) => 
+  return Array.from({ length: 200 }, (_, i) => 
     `${prefixes[Math.floor(Math.random() * prefixes.length)]}.pepu`
   );
 };
@@ -215,9 +208,9 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-white via-blue-50/30 to-yellow-50/30 relative overflow-hidden">
-      {/* Enhanced floating domains with better animations - hidden on small screens for performance */}
+      {/* Floating domains background - hidden on small screens for performance */}
       <div className="hidden md:block">
-        {FLOATING_DOMAINS.slice(0, 500).map((domain, index) => (
+        {FLOATING_DOMAINS.map((domain, index) => (
           <div
             key={`${domain}-${index}`}
             className="absolute text-xs lg:text-sm font-medium text-blue-600/10 pointer-events-none select-none animate-float"
@@ -268,13 +261,13 @@ const Index = () => {
           <div className="space-y-4 md:space-y-8">
             <div className="relative">
               <h2 className="text-4xl md:text-6xl lg:text-7xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-blue-800 bg-clip-text text-transparent mb-3 md:mb-6">
-                Simplify on
+                Your Web3 Identity
               </h2>
               <Sparkles className="absolute top-0 right-1/4 w-6 h-6 md:w-8 md:h-8 text-yellow-400 animate-pulse" />
               <Star className="absolute bottom-0 left-1/4 w-4 h-4 md:w-6 md:h-6 text-purple-400 animate-bounce" />
             </div>
             <h3 className="text-2xl md:text-4xl lg:text-5xl font-bold text-gray-800">
-              Your <span className="text-transparent bg-gradient-to-r from-yellow-500 to-orange-500 bg-clip-text">.pepu</span> Identity
+              Get Your <span className="text-transparent bg-gradient-to-r from-yellow-500 to-orange-500 bg-clip-text">.pepu</span> Domain
             </h3>
             <p className="text-base md:text-xl text-gray-600 max-w-2xl mx-auto px-4">
               Register unique domains on Pepe Unchained V2 blockchain. 
@@ -303,18 +296,14 @@ const Index = () => {
             </div>
           )}
 
-          {/* Search section - main focus */}
+          {/* Search section */}
           <div className="bg-white/80 backdrop-blur-sm rounded-2xl md:rounded-3xl p-4 md:p-8 max-w-3xl mx-auto shadow-2xl border border-white/50 relative overflow-hidden">
-            {/* Decorative elements */}
-            <div className="absolute top-0 left-0 w-24 h-24 md:w-32 md:h-32 bg-gradient-to-br from-yellow-400/20 to-orange-400/20 rounded-full -translate-x-12 -translate-y-12 md:-translate-x-16 md:-translate-y-16"></div>
-            <div className="absolute bottom-0 right-0 w-16 h-16 md:w-24 md:h-24 bg-gradient-to-tl from-blue-400/20 to-purple-400/20 rounded-full translate-x-8 translate-y-8 md:translate-x-12 md:translate-y-12"></div>
-            
             <div className="space-y-4 md:space-y-6 relative">
               <div className="flex flex-col md:flex-row gap-3">
                 <div className="flex-1 relative">
                   <input
                     type="text"
-                    placeholder="SEARCH FOR A NAME"
+                    placeholder="Search for a domain name..."
                     value={searchQuery}
                     onChange={(e) => handleSearchInput(e.target.value)}
                     onKeyDown={handleSearchKeyDown}
@@ -359,7 +348,7 @@ const Index = () => {
             </div>
           </div>
 
-          {/* Stats section - clean design */}
+          {/* Stats section */}
           <div className="text-center">
             <div className="text-6xl md:text-8xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-2">
               {domainCount}/1000
@@ -384,13 +373,13 @@ const Index = () => {
             </div>
           )}
 
-          {/* Registration section */}
+          {/* Status messages */}
           {!isConnected ? (
             <div className="bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-200 rounded-2xl md:rounded-3xl p-6 md:p-8 max-w-md mx-auto text-center backdrop-blur-sm">
               <div className="space-y-4">
                 <h3 className="text-lg md:text-xl font-semibold text-blue-600">Ready to claim your domain?</h3>
                 <p className="text-sm md:text-base text-gray-600">
-                  Connect your wallet using the button above to register a .pepu domain
+                  Connect your wallet to register a .pepu domain
                 </p>
               </div>
             </div>
@@ -436,48 +425,10 @@ const Index = () => {
 
       {/* Footer */}
       <footer className="relative z-10 border-t border-gray-200/50 mt-12 md:mt-20 backdrop-blur-sm">
-        <div className="max-w-4xl mx-auto px-3 md:px-6 py-8 md:py-12">
-          <div className="text-center space-y-6 md:space-y-8">
-            <h3 className="text-lg md:text-2xl font-bold text-transparent bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text">Join Our Community</h3>
-            
-            <div className="flex justify-center gap-4 md:gap-6">
-              <a
-                href="https://x.com/pepeutoken"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-2 text-gray-600 hover:text-blue-600 transition-colors bg-white/80 backdrop-blur-sm px-3 md:px-4 py-2 rounded-xl text-sm md:text-base"
-              >
-                <Twitter className="w-4 h-4 md:w-5 md:h-5" />
-                <span className="hidden md:inline">Twitter</span>
-              </a>
-              <a
-                href="https://t.me/pepeunchained"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-2 text-gray-600 hover:text-blue-600 transition-colors bg-white/80 backdrop-blur-sm px-3 md:px-4 py-2 rounded-xl text-sm md:text-base"
-              >
-                <Send className="w-4 h-4 md:w-5 md:h-5" />
-                <span className="hidden md:inline">Telegram</span>
-              </a>
-            </div>
-
-            <div className="flex justify-center items-center gap-2 text-xs md:text-sm text-gray-500">
-              <span>Built on</span>
-              <a
-                href="https://pepuscan.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-transparent bg-gradient-to-r from-yellow-500 to-orange-500 bg-clip-text hover:from-yellow-400 hover:to-orange-400 transition-all duration-300 flex items-center gap-1 font-medium"
-              >
-                Pepe Unchained V2
-                <ExternalLink className="w-3 h-3" />
-              </a>
-            </div>
-
-            <p className="text-xs md:text-sm text-gray-500">
-              © 2025 Pepu Name Service. All rights reserved.
-            </p>
-          </div>
+        <div className="max-w-4xl mx-auto px-3 md:px-6 py-8 md:py-12 text-center">
+          <p className="text-xs md:text-sm text-gray-500">
+            © 2025 Pepu Name Service. Built on Pepe Unchained V2.
+          </p>
         </div>
       </footer>
     </div>
