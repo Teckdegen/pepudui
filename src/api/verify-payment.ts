@@ -1,7 +1,7 @@
 
 import { supabase } from '@/integrations/supabase/client';
 
-const TREASURY_WALLET = '0x742d35Cc6635C0532925a3b8D17Cc6b9fdc7'; // Real treasury wallet
+const TREASURY_WALLET = '0x742d35Cc6635C0532925a3b8D17Cc6b9fdc70000'; // Fixed - now 42 characters
 const PEPU_RPC_URL = 'https://rpc-pepu-v2-mainnet-0.t.conduit.xyz';
 const REQUIRED_AMOUNT = '5000000'; // 5 USDC (6 decimals for USDC)
 

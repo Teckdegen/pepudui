@@ -215,66 +215,68 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-white via-blue-50/30 to-yellow-50/30 relative overflow-hidden">
-      {/* Enhanced floating domains with better animations */}
-      {FLOATING_DOMAINS.map((domain, index) => (
-        <div
-          key={`${domain}-${index}`}
-          className="absolute text-xs md:text-sm lg:text-base font-medium text-blue-600/10 pointer-events-none select-none animate-float"
-          style={{
-            top: `${Math.random() * 100}%`,
-            left: `${Math.random() * 100}%`,
-            animationDelay: `${Math.random() * 20}s`,
-            animationDuration: `${15 + Math.random() * 25}s`,
-            fontSize: `${0.7 + Math.random() * 0.8}rem`,
-            opacity: 0.08 + Math.random() * 0.15,
-            transform: `rotate(${Math.random() * 360}deg)`,
-          }}
-        >
-          {domain}
-        </div>
-      ))}
+      {/* Enhanced floating domains with better animations - hidden on small screens for performance */}
+      <div className="hidden md:block">
+        {FLOATING_DOMAINS.slice(0, 500).map((domain, index) => (
+          <div
+            key={`${domain}-${index}`}
+            className="absolute text-xs lg:text-sm font-medium text-blue-600/10 pointer-events-none select-none animate-float"
+            style={{
+              top: `${Math.random() * 100}%`,
+              left: `${Math.random() * 100}%`,
+              animationDelay: `${Math.random() * 20}s`,
+              animationDuration: `${15 + Math.random() * 25}s`,
+              fontSize: `${0.7 + Math.random() * 0.8}rem`,
+              opacity: 0.08 + Math.random() * 0.15,
+              transform: `rotate(${Math.random() * 360}deg)`,
+            }}
+          >
+            {domain}
+          </div>
+        ))}
+      </div>
 
       {/* Gradient overlays for depth */}
       <div className="absolute inset-0 bg-gradient-to-t from-white/40 via-transparent to-transparent pointer-events-none" />
       <div className="absolute inset-0 bg-gradient-to-b from-blue-50/20 via-transparent to-yellow-50/20 pointer-events-none" />
 
       {/* Header */}
-      <header className="relative z-10 p-6 backdrop-blur-sm">
+      <header className="relative z-10 p-3 md:p-6 backdrop-blur-sm">
         <div className="max-w-6xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2 md:gap-4">
             <div className="relative">
-              <img src="/lovable-uploads/90659ea0-5d26-4342-9a87-0c004e40af4d.png" alt="Pepu" className="w-12 h-12 rounded-full shadow-lg" />
-              <div className="absolute -top-1 -right-1 w-4 h-4 bg-yellow-400 rounded-full animate-pulse"></div>
+              <img src="/lovable-uploads/90659ea0-5d26-4342-9a87-0c004e40af4d.png" alt="Pepu" className="w-8 h-8 md:w-12 md:h-12 rounded-full shadow-lg" />
+              <div className="absolute -top-1 -right-1 w-3 h-3 md:w-4 md:h-4 bg-yellow-400 rounded-full animate-pulse"></div>
             </div>
             <div>
-              <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+              <h1 className="text-lg md:text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
                 Pepu Names
               </h1>
-              <p className="text-xs text-gray-500">Decentralized Identity</p>
+              <p className="text-xs text-gray-500 hidden md:block">Decentralized Identity</p>
             </div>
           </div>
-          <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-1 shadow-lg">
+          <div className="bg-white/80 backdrop-blur-sm rounded-xl md:rounded-2xl p-1 shadow-lg">
             <ConnectButton />
           </div>
         </div>
       </header>
 
       {/* Main content */}
-      <main className="relative z-10 max-w-4xl mx-auto px-6 py-12">
-        <div className="text-center space-y-12">
+      <main className="relative z-10 max-w-4xl mx-auto px-3 md:px-6 py-6 md:py-12">
+        <div className="text-center space-y-6 md:space-y-12">
           {/* Hero section */}
-          <div className="space-y-8">
+          <div className="space-y-4 md:space-y-8">
             <div className="relative">
-              <h2 className="text-6xl md:text-7xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-blue-800 bg-clip-text text-transparent mb-6">
+              <h2 className="text-4xl md:text-6xl lg:text-7xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-blue-800 bg-clip-text text-transparent mb-3 md:mb-6">
                 Simplify on
               </h2>
-              <Sparkles className="absolute top-0 right-1/4 w-8 h-8 text-yellow-400 animate-pulse" />
-              <Star className="absolute bottom-0 left-1/4 w-6 h-6 text-purple-400 animate-bounce" />
+              <Sparkles className="absolute top-0 right-1/4 w-6 h-6 md:w-8 md:h-8 text-yellow-400 animate-pulse" />
+              <Star className="absolute bottom-0 left-1/4 w-4 h-4 md:w-6 md:h-6 text-purple-400 animate-bounce" />
             </div>
-            <h3 className="text-4xl md:text-5xl font-bold text-gray-800">
+            <h3 className="text-2xl md:text-4xl lg:text-5xl font-bold text-gray-800">
               Your <span className="text-transparent bg-gradient-to-r from-yellow-500 to-orange-500 bg-clip-text">.pepu</span> Identity
             </h3>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+            <p className="text-base md:text-xl text-gray-600 max-w-2xl mx-auto px-4">
               Register unique domains on Pepe Unchained V2 blockchain. 
               <span className="text-transparent bg-gradient-to-r from-yellow-500 to-orange-500 bg-clip-text font-bold"> Only $5 USDC</span> - 
               <span className="text-transparent bg-gradient-to-r from-red-500 to-pink-500 bg-clip-text font-bold"> Limited time discount!</span>
@@ -284,7 +286,7 @@ const Index = () => {
           {/* Payment verification modal */}
           {showPayment && (
             <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-              <div className="max-w-md w-full">
+              <div className="w-full max-w-md">
                 <PaymentVerification
                   walletAddress={address || ''}
                   domainName={selectedDomain}
@@ -302,13 +304,13 @@ const Index = () => {
           )}
 
           {/* Search section - main focus */}
-          <div className="bg-white/80 backdrop-blur-sm rounded-3xl p-8 max-w-3xl mx-auto shadow-2xl border border-white/50 relative overflow-hidden">
+          <div className="bg-white/80 backdrop-blur-sm rounded-2xl md:rounded-3xl p-4 md:p-8 max-w-3xl mx-auto shadow-2xl border border-white/50 relative overflow-hidden">
             {/* Decorative elements */}
-            <div className="absolute top-0 left-0 w-32 h-32 bg-gradient-to-br from-yellow-400/20 to-orange-400/20 rounded-full -translate-x-16 -translate-y-16"></div>
-            <div className="absolute bottom-0 right-0 w-24 h-24 bg-gradient-to-tl from-blue-400/20 to-purple-400/20 rounded-full translate-x-12 translate-y-12"></div>
+            <div className="absolute top-0 left-0 w-24 h-24 md:w-32 md:h-32 bg-gradient-to-br from-yellow-400/20 to-orange-400/20 rounded-full -translate-x-12 -translate-y-12 md:-translate-x-16 md:-translate-y-16"></div>
+            <div className="absolute bottom-0 right-0 w-16 h-16 md:w-24 md:h-24 bg-gradient-to-tl from-blue-400/20 to-purple-400/20 rounded-full translate-x-8 translate-y-8 md:translate-x-12 md:translate-y-12"></div>
             
-            <div className="space-y-6 relative">
-              <div className="flex gap-3">
+            <div className="space-y-4 md:space-y-6 relative">
+              <div className="flex flex-col md:flex-row gap-3">
                 <div className="flex-1 relative">
                   <input
                     type="text"
@@ -316,25 +318,25 @@ const Index = () => {
                     value={searchQuery}
                     onChange={(e) => handleSearchInput(e.target.value)}
                     onKeyDown={handleSearchKeyDown}
-                    className="w-full px-6 py-4 text-lg border-0 bg-white/90 backdrop-blur-sm rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:bg-white placeholder-gray-500 shadow-inner"
+                    className="w-full px-4 md:px-6 py-3 md:py-4 text-base md:text-lg border-0 bg-white/90 backdrop-blur-sm rounded-xl md:rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:bg-white placeholder-gray-500 shadow-inner pr-16"
                     disabled={isLoading}
                   />
-                  <span className="absolute right-6 top-1/2 -translate-y-1/2 text-transparent bg-gradient-to-r from-yellow-500 to-orange-500 bg-clip-text font-bold">
+                  <span className="absolute right-4 md:right-6 top-1/2 -translate-y-1/2 text-transparent bg-gradient-to-r from-yellow-500 to-orange-500 bg-clip-text font-bold text-sm md:text-base">
                     .pepu
                   </span>
                 </div>
                 <button
                   onClick={checkAvailability}
                   disabled={isLoading}
-                  className="px-8 py-4 bg-gradient-to-r from-black to-gray-800 text-white rounded-2xl hover:from-gray-800 hover:to-black transition-all duration-300 flex items-center gap-2 font-medium shadow-lg hover:shadow-xl transform hover:scale-105"
+                  className="px-6 md:px-8 py-3 md:py-4 bg-gradient-to-r from-black to-gray-800 text-white rounded-xl md:rounded-2xl hover:from-gray-800 hover:to-black transition-all duration-300 flex items-center justify-center gap-2 font-medium shadow-lg hover:shadow-xl transform active:scale-95 min-w-[120px]"
                 >
-                  <Search className="w-5 h-5" />
-                  {isLoading ? 'Searching...' : ''}
+                  <Search className="w-4 h-4 md:w-5 md:h-5" />
+                  <span className="hidden md:inline">{isLoading ? 'Searching...' : 'Search'}</span>
                 </button>
               </div>
 
               {availability && (
-                <div className={`text-lg font-bold transition-all duration-300 ${
+                <div className={`text-base md:text-lg font-bold transition-all duration-300 ${
                   availability.includes('available') ? 'text-transparent bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text' : 
                   availability.includes('taken') ? 'text-transparent bg-gradient-to-r from-red-600 to-rose-600 bg-clip-text' : 
                   'text-transparent bg-gradient-to-r from-orange-600 to-yellow-600 bg-clip-text'
@@ -349,7 +351,7 @@ const Index = () => {
               {canRegister && (
                 <button
                   onClick={handleRegister}
-                  className="w-full px-6 py-4 bg-gradient-to-r from-yellow-500 to-orange-500 text-black rounded-2xl hover:from-yellow-400 hover:to-orange-400 transition-all duration-300 font-bold text-lg shadow-lg hover:shadow-xl transform hover:scale-105"
+                  className="w-full px-4 md:px-6 py-3 md:py-4 bg-gradient-to-r from-yellow-500 to-orange-500 text-black rounded-xl md:rounded-2xl hover:from-yellow-400 hover:to-orange-400 transition-all duration-300 font-bold text-base md:text-lg shadow-lg hover:shadow-xl transform active:scale-95"
                 >
                   💎 Register for $5 USDC
                 </button>
@@ -359,14 +361,14 @@ const Index = () => {
 
           {/* Stats section - clean design */}
           <div className="text-center">
-            <div className="text-8xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-2">
+            <div className="text-6xl md:text-8xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-2">
               {domainCount}/1000
             </div>
-            <div className="text-xl text-gray-600">
+            <div className="text-lg md:text-xl text-gray-600">
               domains registered
             </div>
             {domainCount < 1000 && (
-              <div className="text-lg text-transparent bg-gradient-to-r from-yellow-500 to-orange-500 bg-clip-text mt-3 font-bold">
+              <div className="text-base md:text-lg text-transparent bg-gradient-to-r from-yellow-500 to-orange-500 bg-clip-text mt-3 font-bold px-4">
                 🔥 Discount price: Only {1000 - domainCount} left!
               </div>
             )}
@@ -374,38 +376,38 @@ const Index = () => {
 
           {/* Owned domain display */}
           {isConnected && hasOwnedDomain && (
-            <div className="bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-200 rounded-3xl p-6 max-w-md mx-auto backdrop-blur-sm">
+            <div className="bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-200 rounded-2xl md:rounded-3xl p-4 md:p-6 max-w-md mx-auto backdrop-blur-sm">
               <div className="text-center">
-                <div className="text-lg text-gray-600 mb-2">You own:</div>
-                <div className="text-2xl font-bold text-transparent bg-gradient-to-r from-yellow-500 to-orange-500 bg-clip-text">{ownedDomain}</div>
+                <div className="text-base md:text-lg text-gray-600 mb-2">You own:</div>
+                <div className="text-xl md:text-2xl font-bold text-transparent bg-gradient-to-r from-yellow-500 to-orange-500 bg-clip-text break-all">{ownedDomain}</div>
               </div>
             </div>
           )}
 
           {/* Registration section */}
           {!isConnected ? (
-            <div className="bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-200 rounded-3xl p-8 max-w-md mx-auto text-center backdrop-blur-sm">
+            <div className="bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-200 rounded-2xl md:rounded-3xl p-6 md:p-8 max-w-md mx-auto text-center backdrop-blur-sm">
               <div className="space-y-4">
-                <h3 className="text-xl font-semibold text-blue-600">Ready to claim your domain?</h3>
-                <p className="text-gray-600">
+                <h3 className="text-lg md:text-xl font-semibold text-blue-600">Ready to claim your domain?</h3>
+                <p className="text-sm md:text-base text-gray-600">
                   Connect your wallet using the button above to register a .pepu domain
                 </p>
               </div>
             </div>
           ) : isLimitReached ? (
-            <div className="bg-gradient-to-r from-red-50 to-pink-50 border border-red-200 rounded-3xl p-8 max-w-md mx-auto text-center backdrop-blur-sm">
+            <div className="bg-gradient-to-r from-red-50 to-pink-50 border border-red-200 rounded-2xl md:rounded-3xl p-6 md:p-8 max-w-md mx-auto text-center backdrop-blur-sm">
               <div className="space-y-4">
-                <h3 className="text-xl font-semibold text-red-600">Limit Reached</h3>
-                <p className="text-gray-600">
+                <h3 className="text-lg md:text-xl font-semibold text-red-600">Limit Reached</h3>
+                <p className="text-sm md:text-base text-gray-600">
                   All 1,000 domains have been registered!
                 </p>
               </div>
             </div>
           ) : hasOwnedDomain ? (
-            <div className="bg-gradient-to-r from-yellow-50 to-orange-50 border border-yellow-200 rounded-3xl p-8 max-w-md mx-auto text-center backdrop-blur-sm">
+            <div className="bg-gradient-to-r from-yellow-50 to-orange-50 border border-yellow-200 rounded-2xl md:rounded-3xl p-6 md:p-8 max-w-md mx-auto text-center backdrop-blur-sm">
               <div className="space-y-4">
-                <h3 className="text-xl font-semibold text-yellow-600">Already Registered</h3>
-                <p className="text-gray-600">
+                <h3 className="text-lg md:text-xl font-semibold text-yellow-600">Already Registered</h3>
+                <p className="text-sm md:text-base text-gray-600">
                   You can only register one domain per wallet
                 </p>
               </div>
@@ -413,19 +415,19 @@ const Index = () => {
           ) : null}
 
           {/* Info section */}
-          <div className="bg-white/60 backdrop-blur-sm border border-white/50 rounded-3xl p-8 max-w-3xl mx-auto">
-            <div className="grid md:grid-cols-3 gap-6 text-center">
+          <div className="bg-white/60 backdrop-blur-sm border border-white/50 rounded-2xl md:rounded-3xl p-4 md:p-8 max-w-3xl mx-auto">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 text-center">
               <div className="space-y-2">
-                <div className="text-2xl font-bold text-transparent bg-gradient-to-r from-yellow-500 to-orange-500 bg-clip-text">$5 USDC</div>
-                <div className="text-gray-600">Discount price for first 1,000 domains</div>
+                <div className="text-xl md:text-2xl font-bold text-transparent bg-gradient-to-r from-yellow-500 to-orange-500 bg-clip-text">$5 USDC</div>
+                <div className="text-sm md:text-base text-gray-600">Discount price for first 1,000 domains</div>
               </div>
               <div className="space-y-2">
-                <div className="text-2xl font-bold text-transparent bg-gradient-to-r from-blue-500 to-purple-500 bg-clip-text">1/wallet</div>
-                <div className="text-gray-600">One domain per wallet limit</div>
+                <div className="text-xl md:text-2xl font-bold text-transparent bg-gradient-to-r from-blue-500 to-purple-500 bg-clip-text">1/wallet</div>
+                <div className="text-sm md:text-base text-gray-600">One domain per wallet limit</div>
               </div>
               <div className="space-y-2">
-                <div className="text-2xl font-bold text-transparent bg-gradient-to-r from-green-500 to-emerald-500 bg-clip-text">Unique</div>
-                <div className="text-gray-600">All domain names are unique</div>
+                <div className="text-xl md:text-2xl font-bold text-transparent bg-gradient-to-r from-green-500 to-emerald-500 bg-clip-text">Unique</div>
+                <div className="text-sm md:text-base text-gray-600">All domain names are unique</div>
               </div>
             </div>
           </div>
@@ -433,33 +435,33 @@ const Index = () => {
       </main>
 
       {/* Footer */}
-      <footer className="relative z-10 border-t border-gray-200/50 mt-20 backdrop-blur-sm">
-        <div className="max-w-4xl mx-auto px-6 py-12">
-          <div className="text-center space-y-8">
-            <h3 className="text-2xl font-bold text-transparent bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text">Join Our Community</h3>
+      <footer className="relative z-10 border-t border-gray-200/50 mt-12 md:mt-20 backdrop-blur-sm">
+        <div className="max-w-4xl mx-auto px-3 md:px-6 py-8 md:py-12">
+          <div className="text-center space-y-6 md:space-y-8">
+            <h3 className="text-lg md:text-2xl font-bold text-transparent bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text">Join Our Community</h3>
             
-            <div className="flex justify-center gap-6">
+            <div className="flex justify-center gap-4 md:gap-6">
               <a
                 href="https://x.com/pepeutoken"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-2 text-gray-600 hover:text-blue-600 transition-colors bg-white/80 backdrop-blur-sm px-4 py-2 rounded-xl"
+                className="flex items-center gap-2 text-gray-600 hover:text-blue-600 transition-colors bg-white/80 backdrop-blur-sm px-3 md:px-4 py-2 rounded-xl text-sm md:text-base"
               >
-                <Twitter className="w-5 h-5" />
-                Twitter
+                <Twitter className="w-4 h-4 md:w-5 md:h-5" />
+                <span className="hidden md:inline">Twitter</span>
               </a>
               <a
                 href="https://t.me/pepeunchained"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-2 text-gray-600 hover:text-blue-600 transition-colors bg-white/80 backdrop-blur-sm px-4 py-2 rounded-xl"
+                className="flex items-center gap-2 text-gray-600 hover:text-blue-600 transition-colors bg-white/80 backdrop-blur-sm px-3 md:px-4 py-2 rounded-xl text-sm md:text-base"
               >
-                <Send className="w-5 h-5" />
-                Telegram
+                <Send className="w-4 h-4 md:w-5 md:h-5" />
+                <span className="hidden md:inline">Telegram</span>
               </a>
             </div>
 
-            <div className="flex justify-center items-center gap-2 text-sm text-gray-500">
+            <div className="flex justify-center items-center gap-2 text-xs md:text-sm text-gray-500">
               <span>Built on</span>
               <a
                 href="https://pepuscan.com"
@@ -472,7 +474,7 @@ const Index = () => {
               </a>
             </div>
 
-            <p className="text-sm text-gray-500">
+            <p className="text-xs md:text-sm text-gray-500">
               © 2025 Pepu Name Service. All rights reserved.
             </p>
           </div>
