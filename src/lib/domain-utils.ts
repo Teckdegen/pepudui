@@ -11,7 +11,9 @@ export const BANNED_WORDS = [
   'pepeunchainedmod', 'officialpepeunchained', 'pepu-token', 'pepe-token', 'pepe-token-claim',
   'pepu-token-airdrop', 'realpepeunchained', 'realpepu', 'buy-pepeunchained', 'buy-pepu',
   'pepeunchained-nft', 'pepewallet', 'pepuwallet', 'рeрeunchаіned.com', 'ⲣeⲣeunchained',
-  'pepeunÑhаіned', 'рepeunchаined', 'рeрeunchаіned', 'pepeunÑhained'
+  'pepeunÑhаіned', 'рepeunchаined', 'рeрeunchаіned', 'pepeunÑhained', 'Teck', 'wallet', 
+'team', 'pepuns', 'dee', 'lilipad', 'teckdegen', 'pepunameservice', 'onramp', 'offramp', 
+'marketplace', 'launchpad', 
 ];
 
 // Check if domain name contains banned words
