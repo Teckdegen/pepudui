@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAccount, useWriteContract, useWaitForTransactionReceipt } from 'wagmi';
 import { parseUnits } from 'viem';
 
@@ -20,7 +20,7 @@ export const PaymentVerification = ({
   onSuccess, 
   onError 
 }: PaymentVerificationProps) => {
-  const { isConnected } = useAccount();
+  const { isConnected, address } = useAccount();
   const [isProcessing, setIsProcessing] = useState(false);
   const [paymentStatus, setPaymentStatus] = useState<string>('');
   const [txHash, setTxHash] = useState<string | null>(null);
@@ -32,7 +32,7 @@ export const PaymentVerification = ({
   });
 
   const sendPayment = async () => {
-    if (!isConnected) {
+    if (!isConnected || !address) {
       onError('Please connect your wallet');
       return;
     }
@@ -55,7 +55,7 @@ export const PaymentVerification = ({
             ],
             outputs: [{ name: '', type: 'bool' }]
           }
-        ],
+        ] as const,
         functionName: 'transfer',
         args: [
           TREASURY_WALLET as `0x${string}`,
@@ -71,21 +71,21 @@ export const PaymentVerification = ({
   };
 
   // Handle transaction confirmation
-  React.useEffect(() => {
+  useEffect(() => {
     if (hash) {
       setTxHash(hash);
       setPaymentStatus('Transaction sent! Waiting for confirmation...');
     }
   }, [hash]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (isConfirmed && hash) {
       setPaymentStatus('Payment confirmed! Registering domain...');
       verifyPayment(hash);
     }
   }, [isConfirmed, hash]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (writeError) {
       console.error('Write error:', writeError);
       setPaymentStatus('Transaction failed');
