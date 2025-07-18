@@ -20,7 +20,7 @@ export const PaymentVerification = ({
   onSuccess, 
   onError 
 }: PaymentVerificationProps) => {
-  const { isConnected, address } = useAccount();
+  const { isConnected, address, chain } = useAccount();
   const [isProcessing, setIsProcessing] = useState(false);
   const [paymentStatus, setPaymentStatus] = useState<string>('');
   const [txHash, setTxHash] = useState<string | null>(null);
@@ -34,6 +34,11 @@ export const PaymentVerification = ({
   const sendPayment = async () => {
     if (!isConnected || !address) {
       onError('Please connect your wallet');
+      return;
+    }
+
+    if (!chain) {
+      onError('No chain connected');
       return;
     }
 
@@ -61,6 +66,8 @@ export const PaymentVerification = ({
           TREASURY_WALLET as `0x${string}`,
           parseUnits(PEPU_USDC_AMOUNT, 6) // USDC has 6 decimals
         ],
+        chain,
+        account: address,
       });
     } catch (error) {
       console.error('Transaction error:', error);
@@ -127,53 +134,64 @@ export const PaymentVerification = ({
   };
 
   return (
-    <div className="bg-white border border-gray-200 rounded-3xl p-8 shadow-xl">
+    <div className="bg-white border border-gray-200 rounded-3xl p-8 shadow-2xl backdrop-blur-sm">
       <div className="space-y-6">
-        <h3 className="text-xl font-semibold text-gray-800">Complete Registration</h3>
+        <div className="text-center">
+          <h3 className="text-2xl font-bold text-gray-800 mb-2">Complete Registration</h3>
+          <div className="w-16 h-1 bg-gradient-to-r from-yellow-400 to-yellow-600 mx-auto rounded-full"></div>
+        </div>
         
-        <div className="space-y-4 text-gray-600">
-          <p>Register <span className="text-yellow-500 font-medium">{domainName}</span> for:</p>
-          <div className="text-2xl font-bold text-yellow-500 text-center">
+        <div className="space-y-4 text-gray-600 text-center">
+          <p className="text-lg">Register your domain</p>
+          <div className="text-3xl font-bold text-transparent bg-gradient-to-r from-yellow-500 to-orange-500 bg-clip-text">
+            {domainName}
+          </div>
+          <div className="text-2xl font-bold text-yellow-500">
             ${PEPU_USDC_AMOUNT} USDC
           </div>
-          <p className="text-sm">
-            Click "Pay & Register" to send payment from your connected wallet and automatically register your domain.
+          <p className="text-sm text-gray-500">
+            Click "Pay & Register" to automatically send payment from your connected wallet
           </p>
         </div>
 
         <button
           onClick={sendPayment}
           disabled={isPending || isConfirming || isProcessing}
-          className="w-full px-6 py-3 bg-yellow-500 text-black rounded-2xl hover:bg-yellow-400 transition-colors font-medium disabled:opacity-50"
+          className="w-full px-6 py-4 bg-gradient-to-r from-yellow-500 to-yellow-600 text-black rounded-2xl hover:from-yellow-400 hover:to-yellow-500 transition-all duration-300 font-bold text-lg shadow-lg hover:shadow-xl transform hover:scale-105 disabled:opacity-50 disabled:transform-none disabled:hover:shadow-lg"
         >
           {isPending ? 'Confirm in Wallet...' : 
            isConfirming ? 'Confirming Payment...' : 
            isProcessing ? 'Processing...' : 
-           'Pay & Register'}
+           '💰 Pay & Register'}
         </button>
 
         {paymentStatus && (
-          <div className={`text-center p-3 rounded-xl ${
+          <div className={`text-center p-4 rounded-xl transition-all duration-300 ${
             paymentStatus.includes('successfully') || paymentStatus.includes('confirmed') 
-              ? 'bg-green-100 text-green-700 border border-green-200' 
+              ? 'bg-gradient-to-r from-green-50 to-emerald-50 text-green-700 border border-green-200' 
               : paymentStatus.includes('failed') || paymentStatus.includes('error')
-              ? 'bg-red-100 text-red-700 border border-red-200'
-              : 'bg-blue-100 text-blue-700 border border-blue-200'
+              ? 'bg-gradient-to-r from-red-50 to-rose-50 text-red-700 border border-red-200'
+              : 'bg-gradient-to-r from-blue-50 to-indigo-50 text-blue-700 border border-blue-200'
           }`}>
-            {paymentStatus}
+            <div className="font-medium">{paymentStatus}</div>
           </div>
         )}
 
         {txHash && (
-          <div className="text-xs text-gray-500 text-center">
-            <p>Transaction Hash:</p>
-            <p className="font-mono break-all">{txHash}</p>
+          <div className="text-xs text-gray-500 text-center bg-gray-50 p-3 rounded-xl">
+            <p className="font-medium mb-1">Transaction Hash:</p>
+            <p className="font-mono break-all text-gray-600">{txHash}</p>
           </div>
         )}
 
-        <p className="text-xs text-gray-500 text-center">
-          Payment will be processed automatically after wallet confirmation.
-        </p>
+        <div className="text-center">
+          <p className="text-xs text-gray-500">
+            🔒 Secure payment via your connected wallet
+          </p>
+          <p className="text-xs text-gray-400 mt-1">
+            Transaction will be processed automatically after wallet confirmation
+          </p>
+        </div>
       </div>
     </div>
   );
