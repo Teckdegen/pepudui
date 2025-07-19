@@ -22,13 +22,13 @@ export const pepeUnchainedV2 = defineChain({
   },
 });
 
-// Simple RainbowKit configuration
+// Simplified RainbowKit configuration
 export const config = getDefaultConfig({
   appName: 'Pepu Name Service',
-  projectId: 'your-project-id', // Use a default value to avoid env issues
+  projectId: 'your-project-id',
   chains: [pepeUnchainedV2],
   transports: {
-    [pepeUnchainedV2.id]: http('https://rpc-pepu-v2-mainnet-0.t.conduit.xyz'),
+    [pepeUnchainedV2.id]: http(),
   },
   ssr: false,
 });
