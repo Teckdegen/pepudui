@@ -1,4 +1,6 @@
+
 import { getDefaultConfig } from '@rainbow-me/rainbowkit';
+import { http } from 'wagmi';
 
 // Pepe Unchained V2 network configuration
 export const pepeUnchainedV2 = {
@@ -23,10 +25,13 @@ export const pepeUnchainedV2 = {
   },
 } as const;
 
-// RainbowKit configuration
+// RainbowKit configuration with proper transports
 export const config = getDefaultConfig({
   appName: 'Pepu Name Service',
   projectId: import.meta.env.VITE_WALLET_CONNECT_PROJECT_ID || 'your-project-id',
   chains: [pepeUnchainedV2 as any],
+  transports: {
+    [pepeUnchainedV2.id]: http(),
+  },
   ssr: false,
 });

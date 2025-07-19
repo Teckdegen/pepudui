@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { useAccount, useWriteContract, useWaitForTransactionReceipt } from 'wagmi';
+import { useAccount, useWriteContract, useWaitForTransactionReceipt, useSwitchChain } from 'wagmi';
 import { parseUnits } from 'viem';
 
 interface PaymentVerificationProps {
@@ -13,6 +13,7 @@ interface PaymentVerificationProps {
 const TREASURY_WALLET = '0x5359d161d3cdBCfA6C38A387b7F685ebe354368f'; // Your correct treasury address
 const USDC_CONTRACT = '0xA0b86a33E6441b8435b662C0c5b90FdF0Be3D55b'; // USDC on Pepu chain
 const PEPU_USDC_AMOUNT = '5'; // 5 USDC
+const TARGET_CHAIN_ID = 97741; // Pepe Unchained V2 mainnet
 
 export const PaymentVerification = ({ 
   walletAddress, 
@@ -25,6 +26,8 @@ export const PaymentVerification = ({
   const [paymentStatus, setPaymentStatus] = useState<string>('');
   const [txHash, setTxHash] = useState<string | null>(null);
 
+  const { switchChain } = useSwitchChain();
+  
   const { writeContract, data: hash, error: writeError, isPending } = useWriteContract();
 
   const { isLoading: isConfirming, isSuccess: isConfirmed } = useWaitForTransactionReceipt({
@@ -37,9 +40,16 @@ export const PaymentVerification = ({
       return;
     }
 
-    if (!chain) {
-      onError('No chain connected');
-      return;
+    // Check if we're on the correct chain
+    if (chain?.id !== TARGET_CHAIN_ID) {
+      try {
+        setPaymentStatus('Switching to Pepe Unchained V2...');
+        await switchChain({ chainId: TARGET_CHAIN_ID });
+      } catch (error) {
+        console.error('Chain switch error:', error);
+        onError('Please switch to Pepe Unchained V2 network');
+        return;
+      }
     }
 
     setIsProcessing(true);
@@ -69,8 +79,6 @@ export const PaymentVerification = ({
           TREASURY_WALLET as `0x${string}`,
           parseUnits(PEPU_USDC_AMOUNT, 6) // USDC has 6 decimals
         ],
-        chain,
-        account: address,
       });
     } catch (error) {
       console.error('Transaction error:', error);
@@ -143,6 +151,8 @@ export const PaymentVerification = ({
     }
   };
 
+  const isWrongChain = chain?.id !== TARGET_CHAIN_ID;
+
   return (
     <div className="bg-white border border-gray-200 rounded-2xl md:rounded-3xl p-4 md:p-8 shadow-2xl backdrop-blur-sm max-w-md mx-auto">
       <div className="space-y-4 md:space-y-6">
@@ -160,16 +170,28 @@ export const PaymentVerification = ({
             ${PEPU_USDC_AMOUNT} USDC
           </div>
           <p className="text-xs md:text-sm text-gray-500 px-2">
-            Click "Pay & Register" to open your wallet and confirm the payment
+            {isWrongChain 
+              ? 'Please switch to Pepe Unchained V2 network'
+              : 'Click "Pay & Register" to open your wallet and confirm the payment'
+            }
           </p>
         </div>
 
+        {isWrongChain && (
+          <div className="bg-gradient-to-r from-orange-50 to-yellow-50 text-orange-700 border border-orange-200 rounded-xl p-3 text-center">
+            <p className="text-sm font-medium">Wrong Network</p>
+            <p className="text-xs">Switch to Pepe Unchained V2 to continue</p>
+          </div>
+        )}
+
         <button
           onClick={sendPayment}
-          disabled={isPending || isConfirming || isProcessing}
+          disabled={isPending || isConfirming || isProcessing || !isConnected}
           className="w-full px-4 md:px-6 py-3 md:py-4 bg-gradient-to-r from-yellow-500 to-yellow-600 text-black rounded-xl md:rounded-2xl hover:from-yellow-400 hover:to-yellow-500 transition-all duration-300 font-bold text-base md:text-lg shadow-lg hover:shadow-xl transform active:scale-95 disabled:opacity-50 disabled:transform-none disabled:hover:shadow-lg"
         >
-          {isPending ? 'Confirm in Wallet...' : 
+          {!isConnected ? 'Connect Wallet First' :
+           isWrongChain ? 'Switch Network & Pay' :
+           isPending ? 'Confirm in Wallet...' : 
            isConfirming ? 'Confirming Payment...' : 
            isProcessing ? 'Processing...' : 
            '💰 Pay & Register'}
