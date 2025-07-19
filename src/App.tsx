@@ -10,12 +10,22 @@ import { config } from './lib/wallet-config';
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: 1,
+      refetchOnWindowFocus: false,
+    },
+  },
+});
 
 const App = () => (
   <WagmiProvider config={config}>
     <QueryClientProvider client={queryClient}>
-      <RainbowKitProvider>
+      <RainbowKitProvider 
+        locale="en-US"
+        showRecentTransactions={true}
+      >
         <TooltipProvider>
           <Toaster />
           <Sonner />
