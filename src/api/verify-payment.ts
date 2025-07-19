@@ -1,9 +1,9 @@
-
 import { supabase } from '@/integrations/supabase/client';
 
 const TREASURY_WALLET = '0x5359d161d3cdBCfA6C38A387b7F685ebe354368f'; // Fixed - now 42 characters
 const PEPU_RPC_URL = 'https://rpc-pepu-v2-mainnet-0.t.conduit.xyz';
 const REQUIRED_AMOUNT = '5000000'; // 5 USDC (6 decimals for USDC)
+const USDC_CONTRACT_ADDRESS = '0x...'; // TODO: Replace this with the actual USDC contract address on Pepe Unchained V2
 
 async function callPepuRPC(method: string, params: any[] = []) {
   const response = await fetch(PEPU_RPC_URL, {
@@ -51,7 +51,7 @@ async function verifyTransaction(txHash: string, fromAddress: string): Promise<b
       if (
         log.topics?.[0] === transferEventSignature &&
         log.topics?.[2] === treasuryTopic &&
-        log.address?.toLowerCase() === '0xA0b86a33E6441b8435b662C0c5b90FdF0Be3D55b'.toLowerCase() // USDC contract
+        log.address?.toLowerCase() === USDC_CONTRACT_ADDRESS.toLowerCase()
       ) {
         // Parse amount from log data
         const amount = parseInt(log.data, 16).toString();
