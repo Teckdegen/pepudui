@@ -1,6 +1,5 @@
-
 import { getDefaultConfig } from '@rainbow-me/rainbowkit';
-import { http } from 'wagmi';
+import { http, createConfig } from 'wagmi';
 import { defineChain } from 'viem';
 
 // Define Pepe Unchained V2 network configuration
@@ -22,11 +21,8 @@ export const pepeUnchainedV2 = defineChain({
   },
 });
 
-// Updated RainbowKit configuration with a working project ID
-// You can get a free project ID from https://cloud.walletconnect.com/
-export const config = getDefaultConfig({
-  appName: 'Pepu Name Service',
-  projectId: 'c4f79cc821944d9680842e34466bfbd9', // Using a sample project ID - replace with your own
+// Fixed configuration using createConfig instead of getDefaultConfig
+export const config = createConfig({
   chains: [pepeUnchainedV2],
   transports: {
     [pepeUnchainedV2.id]: http(),
