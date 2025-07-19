@@ -2,7 +2,7 @@ import { supabase } from '@/integrations/supabase/client';
 
 const TREASURY_WALLET = '0x5359d161d3cdBCfA6C38A387b7F685ebe354368f'; // Fixed - now 42 characters
 const PEPU_RPC_URL = 'https://rpc-pepu-v2-mainnet-0.t.conduit.xyz';
-const REQUIRED_AMOUNT = '5000000'; // 5 USDC (6 decimals for USDC)
+const REQUIRED_AMOUNT = '5'; // 5 USDC (6 decimals for USDC)
 const USDC_CONTRACT_ADDRESS = '0x0000000000000000000000000000000000000000'; // TODO: Replace this with the actual USDC contract address on Pepe Unchained V2
 
 async function callPepuRPC(method: string, params: any[] = []) {
