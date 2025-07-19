@@ -2,7 +2,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAccount, useWriteContract, useWaitForTransactionReceipt, useSwitchChain } from 'wagmi';
 import { parseUnits } from 'viem';
-import { pepeUnchainedV2 } from '../lib/wallet-config';
 
 interface PaymentVerificationProps {
   walletAddress: string;
@@ -43,14 +42,26 @@ export const PaymentVerification = ({
 
   const { switchChain, isPending: isSwitchingChain } = useSwitchChain();
   
-  const { writeContract, data: hash, error: writeError, isPending } = useWriteContract();
+  const { 
+    writeContract, 
+    data: hash, 
+    error: writeError, 
+    isPending 
+  } = useWriteContract();
 
   const { isLoading: isConfirming, isSuccess: isConfirmed } = useWaitForTransactionReceipt({
     hash,
   });
 
   const sendPayment = async () => {
+    console.log('sendPayment called');
+    console.log('Connected:', isConnected);
+    console.log('Address:', address);
+    console.log('Chain ID:', chain?.id);
+    console.log('Target Chain ID:', TARGET_CHAIN_ID);
+
     if (!isConnected || !address) {
+      console.log('Wallet not connected');
       onError('Please connect your wallet');
       return;
     }
@@ -58,30 +69,40 @@ export const PaymentVerification = ({
     // Check if we're on the correct chain
     if (chain?.id !== TARGET_CHAIN_ID) {
       try {
+        console.log('Switching chain from', chain?.id, 'to', TARGET_CHAIN_ID);
         setPaymentStatus('Switching to Pepe Unchained V2...');
-        console.log('Current chain:', chain?.id, 'Target chain:', TARGET_CHAIN_ID);
         
         await switchChain({ chainId: TARGET_CHAIN_ID });
-        // Wait a bit for the chain switch to complete
-        await new Promise(resolve => setTimeout(resolve, 1000));
+        
+        // Wait for chain switch to complete
+        setTimeout(() => {
+          console.log('Chain switch completed, proceeding with transaction');
+          executeTransaction();
+        }, 2000);
+        return;
       } catch (error) {
         console.error('Chain switch error:', error);
-        onError('Please manually switch to Pepe Unchained V2 network in your wallet');
+        onError('Please manually switch to Pepe Unchained V2 network');
+        setIsProcessing(false);
         return;
       }
     }
 
+    executeTransaction();
+  };
+
+  const executeTransaction = () => {
+    console.log('Executing USDC transfer transaction');
     setIsProcessing(true);
     setPaymentStatus('Opening wallet for confirmation...');
 
     try {
-      console.log('Sending payment transaction:');
+      console.log('Transaction details:');
+      console.log('- Contract:', USDC_CONTRACT);
       console.log('- To:', TREASURY_WALLET);
       console.log('- Amount:', PEPU_USDC_AMOUNT, 'USDC');
       console.log('- From:', address);
-      console.log('- Chain:', chain?.id);
       
-      // Send USDC transfer transaction
       writeContract({
         address: USDC_CONTRACT as `0x${string}`,
         abi: USDC_ABI,
@@ -99,32 +120,35 @@ export const PaymentVerification = ({
     }
   };
 
-  // Handle transaction confirmation
+  // Handle transaction hash
   useEffect(() => {
     if (hash) {
+      console.log('Transaction hash received:', hash);
       setTxHash(hash);
       setPaymentStatus('Transaction sent! Waiting for confirmation...');
-      console.log('Transaction hash:', hash);
     }
   }, [hash]);
 
+  // Handle transaction confirmation
   useEffect(() => {
     if (isConfirmed && hash) {
+      console.log('Transaction confirmed, verifying payment...');
       setPaymentStatus('Payment confirmed! Registering domain...');
-      console.log('Payment confirmed, verifying...');
       verifyPayment(hash);
     }
   }, [isConfirmed, hash]);
 
+  // Handle transaction errors
   useEffect(() => {
     if (writeError) {
       console.error('Write error:', writeError);
       setPaymentStatus('Transaction failed');
-      const errorMessage = writeError.message || 'Transaction failed';
       
-      // Handle specific error cases
-      if (errorMessage.includes('User rejected')) {
-        onError('Transaction was cancelled');
+      const errorMessage = writeError.message || 'Transaction failed';
+      console.log('Error message:', errorMessage);
+      
+      if (errorMessage.includes('User rejected') || errorMessage.includes('user rejected')) {
+        onError('Transaction was cancelled by user');
       } else if (errorMessage.includes('insufficient funds')) {
         onError('Insufficient USDC balance');
       } else {
@@ -157,6 +181,7 @@ export const PaymentVerification = ({
         setPaymentStatus('Domain registered successfully! 🎉');
         onSuccess();
       } else {
+        console.error('Verification failed:', result.error);
         setPaymentStatus(`Registration failed: ${result.error}`);
         onError(result.error);
       }

@@ -3,7 +3,7 @@ import { getDefaultConfig } from '@rainbow-me/rainbowkit';
 import { http } from 'wagmi';
 import { defineChain } from 'viem';
 
-// Properly define Pepe Unchained V2 network configuration
+// Define Pepe Unchained V2 network configuration
 export const pepeUnchainedV2 = defineChain({
   id: 97741,
   name: 'Pepe Unchained V2',
@@ -22,13 +22,13 @@ export const pepeUnchainedV2 = defineChain({
   },
 });
 
-// RainbowKit configuration with proper transports
+// Simple RainbowKit configuration
 export const config = getDefaultConfig({
   appName: 'Pepu Name Service',
-  projectId: import.meta.env.VITE_WALLET_CONNECT_PROJECT_ID || 'your-project-id',
+  projectId: 'your-project-id', // Use a default value to avoid env issues
   chains: [pepeUnchainedV2],
   transports: {
-    [pepeUnchainedV2.id]: http(),
+    [pepeUnchainedV2.id]: http('https://rpc-pepu-v2-mainnet-0.t.conduit.xyz'),
   },
   ssr: false,
 });
