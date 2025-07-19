@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useAccount } from 'wagmi';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
@@ -28,7 +27,7 @@ const generateFloatingDomains = () => {
 const FLOATING_DOMAINS = generateFloatingDomains();
 
 const Index = () => {
-  const { address, isConnected } = useAccount();
+  const { address, isConnected, chainId } = useAccount();
   const { toast } = useToast();
   const [searchQuery, setSearchQuery] = useState('');
   const [domainCount, setDomainCount] = useState(0);
@@ -342,7 +341,7 @@ const Index = () => {
                   onClick={handleRegister}
                   className="w-full px-4 md:px-6 py-3 md:py-4 bg-gradient-to-r from-yellow-500 to-orange-500 text-black rounded-xl md:rounded-2xl hover:from-yellow-400 hover:to-orange-400 transition-all duration-300 font-bold text-base md:text-lg shadow-lg hover:shadow-xl transform active:scale-95"
                 >
-                  💎 Register for $5 USDC
+                  Register for $5 USDC
                 </button>
               )}
             </div>
@@ -358,7 +357,7 @@ const Index = () => {
             </div>
             {domainCount < 1000 && (
               <div className="text-base md:text-lg text-transparent bg-gradient-to-r from-yellow-500 to-orange-500 bg-clip-text mt-3 font-bold px-4">
-                🔥 Discount price: Only {1000 - domainCount} left!
+                Discount price: Only {1000 - domainCount} left!
               </div>
             )}
           </div>
@@ -427,7 +426,7 @@ const Index = () => {
       <footer className="relative z-10 border-t border-gray-200/50 mt-12 md:mt-20 backdrop-blur-sm">
         <div className="max-w-4xl mx-auto px-3 md:px-6 py-8 md:py-12 text-center">
           <p className="text-xs md:text-sm text-gray-500">
-            © 2025 Pepu Name Service. Built on Pepe Unchained V2.
+            2025 Pepu Name Service. Built on Pepe Unchained V2.
           </p>
         </div>
       </footer>
