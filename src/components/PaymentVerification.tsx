@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useAccount, useWriteContract, useWaitForTransactionReceipt, useSwitchChain } from 'wagmi';
 import { parseUnits } from 'viem';
@@ -36,7 +35,7 @@ export const PaymentVerification = ({
   onSuccess, 
   onError 
 }: PaymentVerificationProps) => {
-  const { isConnected, address, chain } = useAccount();
+  const { isConnected, address, chainId } = useAccount();
   const [isProcessing, setIsProcessing] = useState(false);
   const [paymentStatus, setPaymentStatus] = useState<string>('');
   const [txHash, setTxHash] = useState<string | null>(null);
@@ -59,7 +58,7 @@ export const PaymentVerification = ({
     console.log('sendPayment called');
     console.log('Connected:', isConnected);
     console.log('Address:', address);
-    console.log('Chain ID:', chain?.id);
+    console.log('Chain ID:', chainId);
     console.log('Target Chain ID:', TARGET_CHAIN_ID);
 
     if (!isConnected || !address) {
@@ -71,9 +70,9 @@ export const PaymentVerification = ({
     setIsProcessing(true);
 
     // Check if we're on the correct chain
-    if (chain?.id !== TARGET_CHAIN_ID) {
+    if (chainId !== TARGET_CHAIN_ID) {
       try {
-        console.log('Switching chain from', chain?.id, 'to', TARGET_CHAIN_ID);
+        console.log('Switching chain from', chainId, 'to', TARGET_CHAIN_ID);
         setPaymentStatus('Switching to Pepe Unchained V2 network...');
         
         // Switch chain using the new wagmi v2 API
@@ -198,7 +197,7 @@ export const PaymentVerification = ({
     }
   };
 
-  const isWrongChain = chain?.id !== TARGET_CHAIN_ID;
+  const isWrongChain = chainId !== TARGET_CHAIN_ID;
   const isButtonDisabled = isPending || isConfirming || isProcessing || !isConnected || isSwitchingChain;
 
   const getButtonIcon = () => {
@@ -273,7 +272,7 @@ export const PaymentVerification = ({
               <AlertCircle className="w-6 h-6 mr-2" />
               <p className="font-semibold">Wrong Network Detected</p>
             </div>
-            <p className="text-sm mb-1">Current: {chain?.name || 'Unknown'}</p>
+            <p className="text-sm mb-1">Current: {chainId}</p>
             <p className="text-sm font-medium">Required: Pepe Unchained V2</p>
           </div>
         )}
