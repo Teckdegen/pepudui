@@ -79,6 +79,8 @@ export const PaymentVerification = ({
           TREASURY_WALLET as `0x${string}`,
           parseUnits(PEPU_USDC_AMOUNT, 6) // USDC has 6 decimals
         ],
+        chain,
+        account: address,
       });
     } catch (error) {
       console.error('Transaction error:', error);
@@ -154,74 +156,116 @@ export const PaymentVerification = ({
   const isWrongChain = chain?.id !== TARGET_CHAIN_ID;
 
   return (
-    <div className="bg-white border border-gray-200 rounded-2xl md:rounded-3xl p-4 md:p-8 shadow-2xl backdrop-blur-sm max-w-md mx-auto">
-      <div className="space-y-4 md:space-y-6">
+    <div className="relative overflow-hidden bg-gradient-to-br from-white via-yellow-50/30 to-orange-50/40 border border-yellow-200/50 rounded-3xl p-8 shadow-2xl backdrop-blur-sm max-w-md mx-auto">
+      {/* Decorative elements */}
+      <div className="absolute top-4 right-4 w-12 h-12 bg-gradient-to-br from-yellow-400/20 to-orange-400/20 rounded-full blur-xl"></div>
+      <div className="absolute bottom-4 left-4 w-8 h-8 bg-gradient-to-br from-orange-400/30 to-yellow-400/30 rounded-full blur-lg"></div>
+      
+      <div className="relative space-y-6">
         <div className="text-center">
-          <h3 className="text-lg md:text-2xl font-bold text-gray-800 mb-2">Complete Registration</h3>
-          <div className="w-12 md:w-16 h-1 bg-gradient-to-r from-yellow-400 to-yellow-600 mx-auto rounded-full"></div>
+          <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-2xl mb-4 shadow-lg">
+            <span className="text-2xl">🌟</span>
+          </div>
+          <h3 className="text-2xl font-bold text-gray-800 mb-2">Complete Registration</h3>
+          <div className="w-20 h-1 bg-gradient-to-r from-yellow-400 to-orange-500 mx-auto rounded-full"></div>
         </div>
         
-        <div className="space-y-3 md:space-y-4 text-gray-600 text-center">
-          <p className="text-base md:text-lg">Register your domain</p>
-          <div className="text-xl md:text-3xl font-bold text-transparent bg-gradient-to-r from-yellow-500 to-orange-500 bg-clip-text break-all">
-            {domainName}
+        <div className="space-y-4 text-center">
+          <p className="text-lg text-gray-600">Secure your premium domain</p>
+          <div className="relative">
+            <div className="absolute inset-0 bg-gradient-to-r from-yellow-500/20 to-orange-500/20 rounded-2xl blur-sm"></div>
+            <div className="relative bg-white/80 backdrop-blur-sm border border-yellow-200/50 rounded-2xl p-4">
+              <div className="text-2xl font-bold text-transparent bg-gradient-to-r from-yellow-600 to-orange-600 bg-clip-text break-all">
+                {domainName}
+              </div>
+            </div>
           </div>
-          <div className="text-xl md:text-2xl font-bold text-yellow-500">
-            ${PEPU_USDC_AMOUNT} USDC
+          
+          <div className="inline-flex items-center justify-center bg-gradient-to-r from-yellow-500 to-orange-500 text-white px-6 py-3 rounded-2xl shadow-lg">
+            <span className="text-xl font-bold">${PEPU_USDC_AMOUNT} USDC</span>
           </div>
-          <p className="text-xs md:text-sm text-gray-500 px-2">
+          
+          <p className="text-sm text-gray-600 px-4 leading-relaxed">
             {isWrongChain 
-              ? 'Please switch to Pepe Unchained V2 network'
-              : 'Click "Pay & Register" to open your wallet and confirm the payment'
+              ? '⚠️ Please switch to Pepe Unchained V2 network to continue'
+              : '✨ Click below to open your wallet and confirm the secure payment'
             }
           </p>
         </div>
 
         {isWrongChain && (
-          <div className="bg-gradient-to-r from-orange-50 to-yellow-50 text-orange-700 border border-orange-200 rounded-xl p-3 text-center">
-            <p className="text-sm font-medium">Wrong Network</p>
-            <p className="text-xs">Switch to Pepe Unchained V2 to continue</p>
+          <div className="bg-gradient-to-r from-orange-100 to-red-100 border border-orange-300 text-orange-800 rounded-2xl p-4 text-center">
+            <div className="flex items-center justify-center mb-2">
+              <span className="text-2xl mr-2">⚠️</span>
+              <p className="font-semibold">Wrong Network Detected</p>
+            </div>
+            <p className="text-sm">Please switch to Pepe Unchained V2 to continue with your registration</p>
           </div>
         )}
 
         <button
           onClick={sendPayment}
           disabled={isPending || isConfirming || isProcessing || !isConnected}
-          className="w-full px-4 md:px-6 py-3 md:py-4 bg-gradient-to-r from-yellow-500 to-yellow-600 text-black rounded-xl md:rounded-2xl hover:from-yellow-400 hover:to-yellow-500 transition-all duration-300 font-bold text-base md:text-lg shadow-lg hover:shadow-xl transform active:scale-95 disabled:opacity-50 disabled:transform-none disabled:hover:shadow-lg"
+          className="group relative w-full overflow-hidden bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-400 hover:to-orange-400 text-white rounded-2xl py-4 px-6 font-bold text-lg shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:transform-none disabled:hover:shadow-lg"
         >
-          {!isConnected ? 'Connect Wallet First' :
-           isWrongChain ? 'Switch Network & Pay' :
-           isPending ? 'Confirm in Wallet...' : 
-           isConfirming ? 'Confirming Payment...' : 
-           isProcessing ? 'Processing...' : 
-           '💰 Pay & Register'}
+          <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+          <div className="relative flex items-center justify-center space-x-2">
+            <span className="text-2xl">
+              {!isConnected ? '🔗' :
+               isWrongChain ? '🔄' :
+               isPending ? '⏳' : 
+               isConfirming ? '⌛' : 
+               isProcessing ? '🔄' : 
+               '💎'}
+            </span>
+            <span>
+              {!isConnected ? 'Connect Wallet First' :
+               isWrongChain ? 'Switch Network & Pay' :
+               isPending ? 'Confirm in Wallet...' : 
+               isConfirming ? 'Confirming Payment...' : 
+               isProcessing ? 'Processing Registration...' : 
+               'Pay & Register Domain'}
+            </span>
+          </div>
         </button>
 
         {paymentStatus && (
-          <div className={`text-center p-3 md:p-4 rounded-xl transition-all duration-300 ${
+          <div className={`relative overflow-hidden text-center p-4 rounded-2xl transition-all duration-500 ${
             paymentStatus.includes('successfully') || paymentStatus.includes('confirmed') 
-              ? 'bg-gradient-to-r from-green-50 to-emerald-50 text-green-700 border border-green-200' 
+              ? 'bg-gradient-to-r from-green-100 to-emerald-100 text-green-800 border border-green-300' 
               : paymentStatus.includes('failed') || paymentStatus.includes('error')
-              ? 'bg-gradient-to-r from-red-50 to-rose-50 text-red-700 border border-red-200'
-              : 'bg-gradient-to-r from-blue-50 to-indigo-50 text-blue-700 border border-blue-200'
+              ? 'bg-gradient-to-r from-red-100 to-rose-100 text-red-800 border border-red-300'
+              : 'bg-gradient-to-r from-blue-100 to-indigo-100 text-blue-800 border border-blue-300'
           }`}>
-            <div className="font-medium text-sm md:text-base">{paymentStatus}</div>
+            <div className="relative">
+              <div className="font-semibold text-base mb-1">
+                {paymentStatus.includes('successfully') ? '🎉 ' : 
+                 paymentStatus.includes('failed') ? '❌ ' : 
+                 paymentStatus.includes('Switching') ? '🔄 ' :
+                 paymentStatus.includes('Waiting') ? '⏳ ' : '💫 '}
+                {paymentStatus}
+              </div>
+            </div>
           </div>
         )}
 
         {txHash && (
-          <div className="text-xs text-gray-500 text-center bg-gray-50 p-2 md:p-3 rounded-xl">
-            <p className="font-medium mb-1">Transaction Hash:</p>
-            <p className="font-mono break-all text-gray-600 text-xs">{txHash}</p>
+          <div className="bg-gray-50/80 backdrop-blur-sm border border-gray-200 rounded-2xl p-4 text-center">
+            <p className="font-semibold text-gray-700 mb-2 flex items-center justify-center">
+              <span className="mr-2">🔗</span>
+              Transaction Hash
+            </p>
+            <p className="font-mono text-xs text-gray-600 break-all bg-white/60 p-2 rounded-lg">{txHash}</p>
           </div>
         )}
 
-        <div className="text-center">
+        <div className="text-center space-y-2">
+          <div className="flex items-center justify-center space-x-2 text-gray-600">
+            <span className="text-lg">🔒</span>
+            <p className="text-sm font-medium">Secure blockchain payment</p>
+          </div>
           <p className="text-xs text-gray-500">
-            🔒 Secure payment via your connected wallet
-          </p>
-          <p className="text-xs text-gray-400 mt-1">
-            Your wallet will open automatically for confirmation
+            Your wallet will handle the transaction securely
           </p>
         </div>
       </div>
