@@ -22,10 +22,7 @@ const queryClient = new QueryClient({
 const App = () => (
   <WagmiProvider config={config}>
     <QueryClientProvider client={queryClient}>
-      <RainbowKitProvider 
-        locale="en-US"
-        showRecentTransactions={true}
-      >
+      <RainbowKitProvider>
         <TooltipProvider>
           <Toaster />
           <Sonner />
