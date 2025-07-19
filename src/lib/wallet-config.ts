@@ -1,4 +1,3 @@
-
 import { getDefaultConfig } from '@rainbow-me/rainbowkit';
 import { http } from 'wagmi';
 import { defineChain } from 'viem';
@@ -20,6 +19,7 @@ export const pepeUnchainedV2 = defineChain({
   blockExplorers: {
     default: { name: 'PepuScan', url: 'https://pepuscan.com' },
   },
+  testnet: false,
 });
 
 // Final configuration that should work for wallet connections and transaction signing
