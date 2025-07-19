@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAccount, useWriteContract, useWaitForTransactionReceipt, useSwitchChain } from 'wagmi';
 import { parseUnits } from 'viem';
+import { pepeUnchainedV2 } from '../lib/wallet-config';
 
 interface PaymentVerificationProps {
   walletAddress: string;
@@ -10,10 +11,24 @@ interface PaymentVerificationProps {
   onError: (error: string) => void;
 }
 
-const TREASURY_WALLET = '0x5359d161d3cdBCfA6C38A387b7F685ebe354368f'; // Your correct treasury address
-const USDC_CONTRACT = '0xA0b86a33E6441b8435b662C0c5b90FdF0Be3D55b'; // USDC on Pepu chain
-const PEPU_USDC_AMOUNT = '5'; // 5 USDC
-const TARGET_CHAIN_ID = 97741; // Pepe Unchained V2 mainnet
+const TREASURY_WALLET = '0x5359d161d3cdBCfA6C38A387b7F685ebe354368f';
+const USDC_CONTRACT = '0xA0b86a33E6441b8435b662C0c5b90FdF0Be3D55b';
+const PEPU_USDC_AMOUNT = '5';
+const TARGET_CHAIN_ID = 97741;
+
+// USDC transfer ABI
+const USDC_ABI = [
+  {
+    name: 'transfer',
+    type: 'function',
+    stateMutability: 'nonpayable',
+    inputs: [
+      { name: 'to', type: 'address' },
+      { name: 'amount', type: 'uint256' }
+    ],
+    outputs: [{ name: '', type: 'bool' }]
+  }
+] as const;
 
 export const PaymentVerification = ({ 
   walletAddress, 
@@ -26,7 +41,7 @@ export const PaymentVerification = ({
   const [paymentStatus, setPaymentStatus] = useState<string>('');
   const [txHash, setTxHash] = useState<string | null>(null);
 
-  const { switchChain } = useSwitchChain();
+  const { switchChain, isPending: isSwitchingChain } = useSwitchChain();
   
   const { writeContract, data: hash, error: writeError, isPending } = useWriteContract();
 
@@ -44,10 +59,14 @@ export const PaymentVerification = ({
     if (chain?.id !== TARGET_CHAIN_ID) {
       try {
         setPaymentStatus('Switching to Pepe Unchained V2...');
+        console.log('Current chain:', chain?.id, 'Target chain:', TARGET_CHAIN_ID);
+        
         await switchChain({ chainId: TARGET_CHAIN_ID });
+        // Wait a bit for the chain switch to complete
+        await new Promise(resolve => setTimeout(resolve, 1000));
       } catch (error) {
         console.error('Chain switch error:', error);
-        onError('Please switch to Pepe Unchained V2 network');
+        onError('Please manually switch to Pepe Unchained V2 network in your wallet');
         return;
       }
     }
@@ -56,31 +75,21 @@ export const PaymentVerification = ({
     setPaymentStatus('Opening wallet for confirmation...');
 
     try {
-      console.log('Sending payment to treasury:', TREASURY_WALLET);
-      console.log('Amount:', PEPU_USDC_AMOUNT, 'USDC');
+      console.log('Sending payment transaction:');
+      console.log('- To:', TREASURY_WALLET);
+      console.log('- Amount:', PEPU_USDC_AMOUNT, 'USDC');
+      console.log('- From:', address);
+      console.log('- Chain:', chain?.id);
       
       // Send USDC transfer transaction
       writeContract({
         address: USDC_CONTRACT as `0x${string}`,
-        abi: [
-          {
-            name: 'transfer',
-            type: 'function',
-            stateMutability: 'nonpayable',
-            inputs: [
-              { name: 'to', type: 'address' },
-              { name: 'amount', type: 'uint256' }
-            ],
-            outputs: [{ name: '', type: 'bool' }]
-          }
-        ] as const,
+        abi: USDC_ABI,
         functionName: 'transfer',
         args: [
           TREASURY_WALLET as `0x${string}`,
           parseUnits(PEPU_USDC_AMOUNT, 6) // USDC has 6 decimals
         ],
-        chain,
-        account: address,
       });
     } catch (error) {
       console.error('Transaction error:', error);
@@ -111,7 +120,16 @@ export const PaymentVerification = ({
     if (writeError) {
       console.error('Write error:', writeError);
       setPaymentStatus('Transaction failed');
-      onError(writeError.message || 'Transaction failed');
+      const errorMessage = writeError.message || 'Transaction failed';
+      
+      // Handle specific error cases
+      if (errorMessage.includes('User rejected')) {
+        onError('Transaction was cancelled');
+      } else if (errorMessage.includes('insufficient funds')) {
+        onError('Insufficient USDC balance');
+      } else {
+        onError(errorMessage);
+      }
       setIsProcessing(false);
     }
   }, [writeError, onError]);
@@ -119,8 +137,6 @@ export const PaymentVerification = ({
   const verifyPayment = async (transactionHash: string) => {
     try {
       console.log('Verifying payment with hash:', transactionHash);
-      console.log('Wallet:', walletAddress);
-      console.log('Domain:', domainName);
       
       const response = await fetch('/api/verify-payment', {
         method: 'POST',
@@ -154,6 +170,7 @@ export const PaymentVerification = ({
   };
 
   const isWrongChain = chain?.id !== TARGET_CHAIN_ID;
+  const isButtonDisabled = isPending || isConfirming || isProcessing || !isConnected || isSwitchingChain;
 
   return (
     <div className="relative overflow-hidden bg-gradient-to-br from-white via-yellow-50/30 to-orange-50/40 border border-yellow-200/50 rounded-3xl p-8 shadow-2xl backdrop-blur-sm max-w-md mx-auto">
@@ -199,19 +216,21 @@ export const PaymentVerification = ({
               <span className="text-2xl mr-2">⚠️</span>
               <p className="font-semibold">Wrong Network Detected</p>
             </div>
-            <p className="text-sm">Please switch to Pepe Unchained V2 to continue with your registration</p>
+            <p className="text-sm">Current: {chain?.name || 'Unknown'}</p>
+            <p className="text-sm">Required: Pepe Unchained V2</p>
           </div>
         )}
 
         <button
           onClick={sendPayment}
-          disabled={isPending || isConfirming || isProcessing || !isConnected}
+          disabled={isButtonDisabled}
           className="group relative w-full overflow-hidden bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-400 hover:to-orange-400 text-white rounded-2xl py-4 px-6 font-bold text-lg shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:transform-none disabled:hover:shadow-lg"
         >
           <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
           <div className="relative flex items-center justify-center space-x-2">
             <span className="text-2xl">
               {!isConnected ? '🔗' :
+               isSwitchingChain ? '🔄' :
                isWrongChain ? '🔄' :
                isPending ? '⏳' : 
                isConfirming ? '⌛' : 
@@ -220,6 +239,7 @@ export const PaymentVerification = ({
             </span>
             <span>
               {!isConnected ? 'Connect Wallet First' :
+               isSwitchingChain ? 'Switching Network...' :
                isWrongChain ? 'Switch Network & Pay' :
                isPending ? 'Confirm in Wallet...' : 
                isConfirming ? 'Confirming Payment...' : 
