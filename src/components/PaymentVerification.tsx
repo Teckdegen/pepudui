@@ -12,7 +12,7 @@ interface PaymentVerificationProps {
 
 const TREASURY_WALLET = '0x5359d161d3cdBCfA6C38A387b7F685ebe354368f';
 // TODO: Replace this with the actual USDC contract address on Pepe Unchained V2
-const USDC_CONTRACT = '0x20fB684Bfc1aBAaD3AceC5712f2Aa30bd494dF74'; // This was previously the Mainnet USDC address
+const USDC_CONTRACT = '0x0000000000000000000000000000000000000000'; // This was previously the Mainnet USDC address
 const PEPU_USDC_AMOUNT = '5';
 const TARGET_CHAIN_ID = 97741;
 
