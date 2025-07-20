@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useAccount, useWriteContract, useWaitForTransactionReceipt, useSwitchChain } from 'wagmi';
 import { parseUnits } from 'viem';
 import { AlertCircle, CheckCircle, Loader2, Wallet, Shield, Sparkles } from 'lucide-react';
+import { pepeUnchainedV2 } from '../lib/wallet-config';
 
 interface PaymentVerificationProps {
   walletAddress: string;
@@ -120,6 +121,8 @@ export const PaymentVerification = ({
           TREASURY_WALLET as `0x${string}`,
           parseUnits(PEPU_USDC_AMOUNT, 6) // USDC has 6 decimals
         ],
+        chain: pepeUnchainedV2,
+        account: address as `0x${string}`,
       });
     } catch (error) {
       console.error('Transaction error:', error);
