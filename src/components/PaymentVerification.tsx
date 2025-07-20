@@ -1,6 +1,7 @@
+
 import React, { useState, useEffect } from 'react';
 import { useAccount, useWriteContract, useWaitForTransactionReceipt, useSwitchChain } from 'wagmi';
-import { parseUnits } from 'viem';
+import { parseUnits, Address } from 'viem';
 import { AlertCircle, CheckCircle, Loader2, Wallet, Shield, Sparkles } from 'lucide-react';
 import { pepeUnchainedV2 } from '../lib/wallet-config';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -12,13 +13,13 @@ interface PaymentVerificationProps {
   onError: (error: string) => void;
 }
 
-const TREASURY_WALLET = '0x5359d161d3cdBCfA6C38A387b7F685ebe354368f';
-// TODO: Replace this with the actual USDC contract address on Pepe Unchained V2
-const USDC_CONTRACT = '0x0000000000000000000000000000000000000000'; // This was previously the Mainnet USDC address
+const TREASURY_WALLET: Address = '0x5359d161d3cdBCfA6C38A387b7F685ebe354368f';
+// Using a placeholder USDC contract address - this needs to be updated with the actual USDC contract on Pepe Unchained V2
+const USDC_CONTRACT: Address = '0x1234567890123456789012345678901234567890'; // Placeholder address
 const PEPU_USDC_AMOUNT = '5';
 const TARGET_CHAIN_ID = 97741;
 
-// USDC transfer ABI
+// USDC transfer ABI with proper typing
 const USDC_ABI = [
   {
     name: 'transfer',
@@ -43,7 +44,6 @@ export const PaymentVerification = ({
   const [paymentStatus, setPaymentStatus] = useState<string>('');
   const [txHash, setTxHash] = useState<string | null>(null);
 
-  // Use the updated useSwitchChain hook
   const { switchChain, isPending: isSwitchingChain } = useSwitchChain();
   
   const { 
@@ -83,10 +83,8 @@ export const PaymentVerification = ({
         console.log('Switching chain from', chainId, 'to', TARGET_CHAIN_ID);
         setPaymentStatus('Switching to Pepe Unchained V2 network...');
         
-        // Switch chain using the new wagmi v2 API
         await switchChain({ chainId: TARGET_CHAIN_ID });
         
-        // Wait a moment for the chain switch to complete
         setTimeout(() => {
           executeTransaction();
         }, 1000);
@@ -107,6 +105,12 @@ export const PaymentVerification = ({
     console.log('Executing USDC transfer transaction');
     setPaymentStatus('Preparing transaction...');
 
+    if (!address) {
+      onError('Wallet address not found');
+      setIsProcessing(false);
+      return;
+    }
+
     try {
       console.log('Transaction details:');
       console.log('- Contract:', USDC_CONTRACT);
@@ -115,15 +119,15 @@ export const PaymentVerification = ({
       console.log('- From:', address);
       
       writeContract({
-        address: USDC_CONTRACT as `0x${string}`,
+        address: USDC_CONTRACT,
         abi: USDC_ABI,
         functionName: 'transfer',
         args: [
-          TREASURY_WALLET as `0x${string}`,
+          TREASURY_WALLET,
           parseUnits(PEPU_USDC_AMOUNT, 6) // USDC has 6 decimals
         ],
         chain: pepeUnchainedV2,
-        account: address as `0x${string}`,
+        account: address,
       });
     } catch (error) {
       console.error('Transaction error:', error);
