@@ -3,6 +3,7 @@ import { useAccount, useWriteContract, useWaitForTransactionReceipt, useSwitchCh
 import { parseUnits } from 'viem';
 import { AlertCircle, CheckCircle, Loader2, Wallet, Shield, Sparkles } from 'lucide-react';
 import { pepeUnchainedV2 } from '../lib/wallet-config';
+import { ScrollArea } from '@/components/ui/scroll-area';
 
 interface PaymentVerificationProps {
   walletAddress: string;
@@ -241,55 +242,98 @@ export const PaymentVerification = ({
 
   return (
     <div 
-      className="relative overflow-hidden bg-gradient-to-br from-white via-yellow-50/50 to-orange-50/50 border border-yellow-200/60 rounded-3xl p-8 shadow-2xl backdrop-blur-sm max-w-md mx-auto animate-fade-in"
+      className="relative w-full max-w-md max-h-[90vh] overflow-hidden bg-white rounded-3xl shadow-2xl"
       onClick={handleModalClick}
     >
-      {/* Floating decorative elements */}
-      <div className="absolute top-4 right-4 w-16 h-16 bg-gradient-to-br from-yellow-400/20 to-orange-400/20 rounded-full blur-xl animate-pulse"></div>
-      <div className="absolute bottom-4 left-4 w-10 h-10 bg-gradient-to-br from-orange-400/30 to-yellow-400/30 rounded-full blur-lg animate-bounce"></div>
-      
-      <div className="relative space-y-6">
-        {/* Header */}
+      {/* Header - Fixed */}
+      <div className="relative bg-gradient-to-br from-yellow-50 to-orange-50 p-6 border-b border-yellow-200/60">
         <div className="text-center">
           <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-3xl mb-4 shadow-xl relative overflow-hidden">
             <div className="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent"></div>
             <Sparkles className="w-8 h-8 text-white relative z-10" />
           </div>
-          <h3 className="text-2xl font-bold text-gray-800 mb-3">Complete Registration</h3>
+          <h3 className="text-2xl font-bold text-gray-800 mb-2">Complete Registration</h3>
           <div className="w-24 h-1.5 bg-gradient-to-r from-yellow-400 to-orange-500 mx-auto rounded-full shadow-sm"></div>
         </div>
-        
-        {/* Domain display */}
-        <div className="space-y-4 text-center">
-          <p className="text-lg text-gray-600 font-medium">Secure your premium domain</p>
-          <div className="relative group">
-            <div className="absolute inset-0 bg-gradient-to-r from-yellow-500/20 to-orange-500/20 rounded-2xl blur-md group-hover:blur-lg transition-all duration-300"></div>
-            <div className="relative bg-white/90 backdrop-blur-sm border border-yellow-200/60 rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300">
-              <div className="text-2xl font-bold text-transparent bg-gradient-to-r from-yellow-600 to-orange-600 bg-clip-text break-all">
-                {domainName}
+      </div>
+
+      {/* Scrollable Content */}
+      <ScrollArea className="h-full max-h-[60vh]">
+        <div className="p-6 space-y-6">
+          {/* Domain display */}
+          <div className="space-y-4 text-center">
+            <p className="text-lg text-gray-600 font-medium">Secure your premium domain</p>
+            <div className="relative group">
+              <div className="absolute inset-0 bg-gradient-to-r from-yellow-500/20 to-orange-500/20 rounded-2xl blur-md group-hover:blur-lg transition-all duration-300"></div>
+              <div className="relative bg-white/90 backdrop-blur-sm border border-yellow-200/60 rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300">
+                <div className="text-2xl font-bold text-transparent bg-gradient-to-r from-yellow-600 to-orange-600 bg-clip-text break-all">
+                  {domainName}
+                </div>
               </div>
             </div>
+            
+            <div className="inline-flex items-center justify-center bg-gradient-to-r from-yellow-500 to-orange-500 text-white px-8 py-4 rounded-2xl shadow-xl">
+              <Shield className="w-5 h-5 mr-2" />
+              <span className="text-xl font-bold">${PEPU_USDC_AMOUNT} USDC</span>
+            </div>
           </div>
-          
-          <div className="inline-flex items-center justify-center bg-gradient-to-r from-yellow-500 to-orange-500 text-white px-8 py-4 rounded-2xl shadow-xl">
-            <Shield className="w-5 h-5 mr-2" />
-            <span className="text-xl font-bold">${PEPU_USDC_AMOUNT} USDC</span>
+
+          {/* Network warning */}
+          {isWrongChain && (
+            <div className="bg-gradient-to-r from-orange-100 to-red-100 border border-orange-300 text-orange-800 rounded-2xl p-5 text-center animate-fade-in">
+              <div className="flex items-center justify-center mb-3">
+                <AlertCircle className="w-6 h-6 mr-2" />
+                <p className="font-semibold">Wrong Network Detected</p>
+              </div>
+              <p className="text-sm mb-1">Current: {chainId}</p>
+              <p className="text-sm font-medium">Required: Pepe Unchained V2</p>
+            </div>
+          )}
+
+          {/* Status display */}
+          {paymentStatus && (
+            <div className={`relative overflow-hidden text-center p-5 rounded-2xl transition-all duration-500 animate-fade-in ${
+              paymentStatus.includes('successfully') || paymentStatus.includes('confirmed') 
+                ? 'bg-gradient-to-r from-green-100 to-emerald-100 text-green-800 border border-green-300' 
+                : paymentStatus.includes('failed') || paymentStatus.includes('error')
+                ? 'bg-gradient-to-r from-red-100 to-rose-100 text-red-800 border border-red-300'
+                : 'bg-gradient-to-r from-blue-100 to-indigo-100 text-blue-800 border border-blue-300'
+            }`}>
+              <div className="flex items-center justify-center mb-2">
+                {getStatusIcon()}
+                <span className="ml-2 font-semibold text-base">{paymentStatus}</span>
+              </div>
+            </div>
+          )}
+
+          {/* Transaction hash */}
+          {txHash && (
+            <div className="bg-gray-50/90 backdrop-blur-sm border border-gray-200 rounded-2xl p-5 text-center animate-fade-in">
+              <div className="flex items-center justify-center mb-3">
+                <Shield className="w-5 h-5 mr-2 text-gray-600" />
+                <p className="font-semibold text-gray-700">Transaction Hash</p>
+              </div>
+              <p className="font-mono text-xs text-gray-600 break-all bg-white/80 p-3 rounded-lg border">
+                {txHash}
+              </p>
+            </div>
+          )}
+
+          {/* Security footer */}
+          <div className="text-center space-y-3 pt-2">
+            <div className="flex items-center justify-center space-x-2 text-gray-600">
+              <Shield className="w-5 h-5" />
+              <p className="text-sm font-medium">Secure blockchain payment</p>
+            </div>
+            <p className="text-xs text-gray-500 leading-relaxed">
+              Your wallet will handle the transaction securely on the Pepe Unchained V2 network
+            </p>
           </div>
         </div>
+      </ScrollArea>
 
-        {/* Network warning */}
-        {isWrongChain && (
-          <div className="bg-gradient-to-r from-orange-100 to-red-100 border border-orange-300 text-orange-800 rounded-2xl p-5 text-center animate-fade-in">
-            <div className="flex items-center justify-center mb-3">
-              <AlertCircle className="w-6 h-6 mr-2" />
-              <p className="font-semibold">Wrong Network Detected</p>
-            </div>
-            <p className="text-sm mb-1">Current: {chainId}</p>
-            <p className="text-sm font-medium">Required: Pepe Unchained V2</p>
-          </div>
-        )}
-
-        {/* Main action button */}
+      {/* Fixed Footer with Action Button */}
+      <div className="border-t border-gray-200 p-6 bg-white">
         <button
           onClick={sendPayment}
           disabled={isButtonDisabled}
@@ -301,46 +345,6 @@ export const PaymentVerification = ({
             <span>{getButtonText()}</span>
           </div>
         </button>
-
-        {/* Status display */}
-        {paymentStatus && (
-          <div className={`relative overflow-hidden text-center p-5 rounded-2xl transition-all duration-500 animate-fade-in ${
-            paymentStatus.includes('successfully') || paymentStatus.includes('confirmed') 
-              ? 'bg-gradient-to-r from-green-100 to-emerald-100 text-green-800 border border-green-300' 
-              : paymentStatus.includes('failed') || paymentStatus.includes('error')
-              ? 'bg-gradient-to-r from-red-100 to-rose-100 text-red-800 border border-red-300'
-              : 'bg-gradient-to-r from-blue-100 to-indigo-100 text-blue-800 border border-blue-300'
-          }`}>
-            <div className="flex items-center justify-center mb-2">
-              {getStatusIcon()}
-              <span className="ml-2 font-semibold text-base">{paymentStatus}</span>
-            </div>
-          </div>
-        )}
-
-        {/* Transaction hash */}
-        {txHash && (
-          <div className="bg-gray-50/90 backdrop-blur-sm border border-gray-200 rounded-2xl p-5 text-center animate-fade-in">
-            <div className="flex items-center justify-center mb-3">
-              <Shield className="w-5 h-5 mr-2 text-gray-600" />
-              <p className="font-semibold text-gray-700">Transaction Hash</p>
-            </div>
-            <p className="font-mono text-xs text-gray-600 break-all bg-white/80 p-3 rounded-lg border">
-              {txHash}
-            </p>
-          </div>
-        )}
-
-        {/* Security footer */}
-        <div className="text-center space-y-3 pt-2">
-          <div className="flex items-center justify-center space-x-2 text-gray-600">
-            <Shield className="w-5 h-5" />
-            <p className="text-sm font-medium">Secure blockchain payment</p>
-          </div>
-          <p className="text-xs text-gray-500 leading-relaxed">
-            Your wallet will handle the transaction securely on the Pepe Unchained V2 network
-          </p>
-        </div>
       </div>
     </div>
   );
