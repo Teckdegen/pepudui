@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react';
-import { Search, Sparkles, Star, Settings, Clock, User, Calendar, AlertCircle } from 'lucide-react';
+import { useAccount } from 'wagmi';
+import { ConnectButton } from '@rainbow-me/rainbowkit';
+import { Search, Sparkles, Star, Settings, Clock, User, Calendar } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { formatDomain, isValidFullDomain, hasBannedWords, extractDomainName } from '../lib/domain-utils';
-import { PaymentVerificationSimple as PaymentVerification } from '../components/PaymentVerificationSimple';
+import { PaymentVerification } from '../components/PaymentVerification';
 import { DomainInfoModal } from '../components/DomainInfoModal';
 import { useToast } from '@/hooks/use-toast';
-import { DomainInfoCard } from '@/components/DomainInfoCard';
 
 // Generate floating domain names for background effect
 const generateFloatingDomains = () => {
@@ -27,10 +28,7 @@ const generateFloatingDomains = () => {
 const FLOATING_DOMAINS = generateFloatingDomains();
 
 const Index = () => {
-  // Temporarily disable wagmi hooks to fix TypeScript compiler error
-  const address = '';
-  const isConnected = false;
-  const chainId = null;
+  const { address, isConnected, chainId } = useAccount();
   const { toast } = useToast();
   const [searchQuery, setSearchQuery] = useState('');
   const [domainCount, setDomainCount] = useState(0);
@@ -59,7 +57,7 @@ const Index = () => {
     }
   };
 
-  // Enhanced check for owned domain to prevent registration
+  // Fetch owned domain for connected wallet
   const fetchOwnedDomain = async () => {
     if (!address) {
       setOwnedDomain(null);
@@ -67,8 +65,6 @@ const Index = () => {
       return;
     }
 
-    console.log('Checking for owned domains for address:', address);
-    
     try {
       const { data, error } = await supabase
         .from('domains')
@@ -78,8 +74,6 @@ const Index = () => {
         .maybeSingle();
       
       if (error) throw error;
-      
-      console.log('Owned domain data:', data);
       setOwnedDomain(data?.name || null);
       setOwnedDomainExpiry(data?.expiry || null);
     } catch (err) {
@@ -161,21 +155,12 @@ const Index = () => {
     }
   };
 
-  // Enhanced register handler with ownership check
+  // Handle register domain
   const handleRegister = () => {
     if (!isConnected) {
       toast({
         title: "Wallet Required",
         description: "Please connect your wallet to register a domain",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    if (hasOwnedDomain) {
-      toast({
-        title: "Domain Limit Reached",
-        description: "This wallet already owns a domain. Only one domain per wallet is allowed.",
         variant: "destructive",
       });
       return;
@@ -289,10 +274,8 @@ const Index = () => {
               <p className="text-xs text-gray-500 hidden md:block">Decentralized Identity</p>
             </div>
           </div>
-          <div className="bg-white/80 backdrop-blur-sm rounded-xl md:rounded-2xl p-2 shadow-lg">
-            <button className="px-4 py-2 bg-blue-600 text-white rounded-lg font-medium">
-              Connect Wallet (Temporarily Disabled)
-            </button>
+          <div className="bg-white/80 backdrop-blur-sm rounded-xl md:rounded-2xl p-1 shadow-lg">
+            <ConnectButton />
           </div>
         </div>
       </header>
@@ -319,35 +302,27 @@ const Index = () => {
             </p>
           </div>
 
-          {/* Enhanced Domain Management for existing owners */}
+          {/* Domain Management for existing owners */}
           {isConnected && hasOwnedDomain && (
             <div className="bg-gradient-to-r from-emerald-50 to-green-50 border border-emerald-200 rounded-3xl p-6 md:p-8 max-w-2xl mx-auto backdrop-blur-sm shadow-lg">
               <div className="space-y-6">
                 <div className="flex items-center justify-center gap-3">
                   <Settings className="w-6 h-6 text-emerald-600" />
-                  <h3 className="text-xl md:text-2xl font-bold text-emerald-700">Your Domain</h3>
+                  <h3 className="text-xl md:text-2xl font-bold text-emerald-700">Manage Your Domain</h3>
                 </div>
                 
-                <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-6 space-y-4 border border-white/60">
-                  <div className="text-center">
-                    <div className="text-2xl md:text-3xl font-bold text-transparent bg-gradient-to-r from-yellow-500 to-orange-500 bg-clip-text break-all mb-3">
+                <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 space-y-4">
+                  <div className="flex items-center justify-center gap-2">
+                    <div className="text-2xl md:text-3xl font-bold text-transparent bg-gradient-to-r from-yellow-500 to-orange-500 bg-clip-text break-all">
                       {ownedDomain}
-                    </div>
-                    <div className="inline-flex items-center gap-2 px-4 py-2 bg-green-100 text-green-700 rounded-full text-sm font-medium">
-                      <Shield className="w-4 h-4" />
-                      Active Registration
                     </div>
                   </div>
                   
                   {ownedDomainExpiry && (
-                    <div className="flex items-center justify-center gap-2 text-gray-600 pt-4 border-t border-gray-100">
+                    <div className="flex items-center justify-center gap-2 text-gray-600">
                       <Calendar className="w-4 h-4" />
                       <span className="text-sm">
-                        Expires: {new Date(ownedDomainExpiry).toLocaleDateString('en-US', {
-                          year: 'numeric',
-                          month: 'long',
-                          day: 'numeric'
-                        })}
+                        Expires: {new Date(ownedDomainExpiry).toLocaleDateString()}
                       </span>
                     </div>
                   )}
@@ -357,7 +332,7 @@ const Index = () => {
                       disabled
                       className="w-full px-6 py-3 bg-gradient-to-r from-gray-300 to-gray-400 text-gray-600 rounded-xl font-bold text-lg cursor-not-allowed opacity-75"
                     >
-                      Domain Management - Coming Soon
+                      Renew Domain - Coming Soon
                     </button>
                   </div>
                 </div>
@@ -371,12 +346,20 @@ const Index = () => {
               className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50"
               onClick={handlePaymentBackdropClick}
             >
-              <PaymentVerification
-                walletAddress={address || ''}
-                domainName={selectedDomain}
-                onSuccess={handlePaymentSuccess}
-                onError={handlePaymentError}
-              />
+              <div className="w-full max-w-md">
+                <PaymentVerification
+                  walletAddress={address || ''}
+                  domainName={selectedDomain}
+                  onSuccess={handlePaymentSuccess}
+                  onError={handlePaymentError}
+                />
+                <button
+                  onClick={() => setShowPayment(false)}
+                  className="mt-4 w-full px-4 py-2 text-gray-600 hover:text-gray-800 transition-colors bg-white/80 backdrop-blur-sm rounded-xl"
+                >
+                  Cancel
+                </button>
+              </div>
             </div>
           )}
 
@@ -388,7 +371,7 @@ const Index = () => {
             />
           )}
 
-          {/* Enhanced Search section */}
+          {/* Search section */}
           <div className="bg-white/90 backdrop-blur-md rounded-3xl p-6 md:p-8 max-w-3xl mx-auto shadow-2xl border border-white/60 relative overflow-hidden">
             <div className="space-y-6 relative">
               <div className="flex flex-col md:flex-row gap-3">
@@ -426,13 +409,18 @@ const Index = () => {
                     {availability}
                   </div>
                   
-                  {/* Enhanced taken domain display */}
+                  {/* Clickable taken domain */}
                   {availability.includes('taken') && takenDomainInfo && (
                     <div className="flex justify-center">
-                      <DomainInfoCard
-                        domainInfo={takenDomainInfo}
-                        onViewDetails={handleDomainInfoClick}
-                      />
+                      <button
+                        onClick={handleDomainInfoClick}
+                        className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-red-100 to-rose-100 hover:from-red-200 hover:to-rose-200 border border-red-300 rounded-xl transition-all duration-300 hover:shadow-lg group"
+                      >
+                        <span className="text-lg font-bold text-transparent bg-gradient-to-r from-yellow-600 to-orange-600 bg-clip-text">
+                          {takenDomainInfo.name}
+                        </span>
+                        <User className="w-4 h-4 text-red-600 group-hover:scale-110 transition-transform" />
+                      </button>
                     </div>
                   )}
                 </div>
@@ -440,7 +428,7 @@ const Index = () => {
 
               {error && <div className="text-red-600 font-medium">{error}</div>}
 
-              {/* Enhanced Register button with ownership check */}
+              {/* Register button */}
               {canRegister && (
                 <button
                   onClick={handleRegister}
@@ -448,19 +436,6 @@ const Index = () => {
                 >
                   Register for $5 USDC
                 </button>
-              )}
-
-              {/* Ownership warning */}
-              {availability.includes('available') && hasOwnedDomain && (
-                <div className="bg-gradient-to-r from-amber-50 to-yellow-50 border border-amber-200 rounded-2xl p-5 text-center">
-                  <div className="flex items-center justify-center mb-2">
-                    <AlertCircle className="w-5 h-5 mr-2 text-amber-600" />
-                    <p className="font-semibold text-amber-700">Registration Blocked</p>
-                  </div>
-                  <p className="text-sm text-amber-600">
-                    This wallet already owns <span className="font-medium">{ownedDomain}</span>. Only one domain per wallet is allowed.
-                  </p>
-                </div>
               )}
             </div>
           </div>
