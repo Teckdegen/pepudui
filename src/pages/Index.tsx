@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
 import { useAccount } from 'wagmi';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
-import { Search, Sparkles, Star } from 'lucide-react';
+import { Search, Sparkles, Star, Settings, Clock, User, Calendar } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { formatDomain, isValidFullDomain, hasBannedWords, extractDomainName } from '../lib/domain-utils';
 import { PaymentVerification } from '../components/PaymentVerification';
+import { DomainInfoModal } from '../components/DomainInfoModal';
 import { useToast } from '@/hooks/use-toast';
 
 // Generate floating domain names for background effect
@@ -32,11 +33,14 @@ const Index = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [domainCount, setDomainCount] = useState(0);
   const [ownedDomain, setOwnedDomain] = useState<string | null>(null);
+  const [ownedDomainExpiry, setOwnedDomainExpiry] = useState<string | null>(null);
   const [availability, setAvailability] = useState<string>('');
   const [error, setError] = useState<string>('');
   const [isLoading, setIsLoading] = useState(false);
   const [showPayment, setShowPayment] = useState(false);
   const [selectedDomain, setSelectedDomain] = useState<string>('');
+  const [takenDomainInfo, setTakenDomainInfo] = useState<{owner: string, expiry: string, name: string} | null>(null);
+  const [showDomainInfo, setShowDomainInfo] = useState(false);
 
   // Fetch domain count from Supabase
   const fetchDomainCount = async () => {
@@ -57,22 +61,25 @@ const Index = () => {
   const fetchOwnedDomain = async () => {
     if (!address) {
       setOwnedDomain(null);
+      setOwnedDomainExpiry(null);
       return;
     }
 
     try {
       const { data, error } = await supabase
         .from('domains')
-        .select('name')
+        .select('name, expiry')
         .eq('owner', address.toLowerCase())
         .eq('paid', true)
         .maybeSingle();
       
       if (error) throw error;
       setOwnedDomain(data?.name || null);
+      setOwnedDomainExpiry(data?.expiry || null);
     } catch (err) {
       console.error('Error fetching owned domain:', err);
       setOwnedDomain(null);
+      setOwnedDomainExpiry(null);
     }
   };
 
@@ -80,6 +87,7 @@ const Index = () => {
   const checkAvailability = async () => {
     setError('');
     setAvailability('');
+    setTakenDomainInfo(null);
     
     if (!searchQuery.trim()) {
       setAvailability('Please enter a domain name');
@@ -106,7 +114,7 @@ const Index = () => {
     try {
       const { data, error } = await supabase
         .from('domains')
-        .select('name')
+        .select('name, owner, expiry')
         .eq('name', fullDomain)
         .eq('paid', true)
         .maybeSingle();
@@ -115,6 +123,11 @@ const Index = () => {
       
       if (data) {
         setAvailability('Domain is taken');
+        setTakenDomainInfo({
+          name: data.name,
+          owner: data.owner,
+          expiry: data.expiry
+        });
       } else {
         setAvailability('Domain is available! 🎉');
         setSelectedDomain(fullDomain);
@@ -186,6 +199,20 @@ const Index = () => {
       description: error,
       variant: "destructive",
     });
+  };
+
+  // Handle clicking outside payment modal
+  const handlePaymentBackdropClick = (e: React.MouseEvent) => {
+    if (e.target === e.currentTarget) {
+      setShowPayment(false);
+    }
+  };
+
+  // Handle domain info click
+  const handleDomainInfoClick = () => {
+    if (takenDomainInfo) {
+      setShowDomainInfo(true);
+    }
   };
 
   useEffect(() => {
@@ -275,9 +302,50 @@ const Index = () => {
             </p>
           </div>
 
+          {/* Domain Management for existing owners */}
+          {isConnected && hasOwnedDomain && (
+            <div className="bg-gradient-to-r from-emerald-50 to-green-50 border border-emerald-200 rounded-3xl p-6 md:p-8 max-w-2xl mx-auto backdrop-blur-sm shadow-lg">
+              <div className="space-y-6">
+                <div className="flex items-center justify-center gap-3">
+                  <Settings className="w-6 h-6 text-emerald-600" />
+                  <h3 className="text-xl md:text-2xl font-bold text-emerald-700">Manage Your Domain</h3>
+                </div>
+                
+                <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 space-y-4">
+                  <div className="flex items-center justify-center gap-2">
+                    <div className="text-2xl md:text-3xl font-bold text-transparent bg-gradient-to-r from-yellow-500 to-orange-500 bg-clip-text break-all">
+                      {ownedDomain}
+                    </div>
+                  </div>
+                  
+                  {ownedDomainExpiry && (
+                    <div className="flex items-center justify-center gap-2 text-gray-600">
+                      <Calendar className="w-4 h-4" />
+                      <span className="text-sm">
+                        Expires: {new Date(ownedDomainExpiry).toLocaleDateString()}
+                      </span>
+                    </div>
+                  )}
+                  
+                  <div className="pt-4">
+                    <button
+                      disabled
+                      className="w-full px-6 py-3 bg-gradient-to-r from-gray-300 to-gray-400 text-gray-600 rounded-xl font-bold text-lg cursor-not-allowed opacity-75"
+                    >
+                      Renew Domain - Coming Soon
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* Payment verification modal */}
           {showPayment && (
-            <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+            <div 
+              className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50"
+              onClick={handlePaymentBackdropClick}
+            >
               <div className="w-full max-w-md">
                 <PaymentVerification
                   walletAddress={address || ''}
@@ -295,9 +363,17 @@ const Index = () => {
             </div>
           )}
 
+          {/* Domain Info Modal */}
+          {showDomainInfo && takenDomainInfo && (
+            <DomainInfoModal
+              domainInfo={takenDomainInfo}
+              onClose={() => setShowDomainInfo(false)}
+            />
+          )}
+
           {/* Search section */}
-          <div className="bg-white/80 backdrop-blur-sm rounded-2xl md:rounded-3xl p-4 md:p-8 max-w-3xl mx-auto shadow-2xl border border-white/50 relative overflow-hidden">
-            <div className="space-y-4 md:space-y-6 relative">
+          <div className="bg-white/90 backdrop-blur-md rounded-3xl p-6 md:p-8 max-w-3xl mx-auto shadow-2xl border border-white/60 relative overflow-hidden">
+            <div className="space-y-6 relative">
               <div className="flex flex-col md:flex-row gap-3">
                 <div className="flex-1 relative">
                   <input
@@ -306,30 +382,47 @@ const Index = () => {
                     value={searchQuery}
                     onChange={(e) => handleSearchInput(e.target.value)}
                     onKeyDown={handleSearchKeyDown}
-                    className="w-full px-4 md:px-6 py-3 md:py-4 text-base md:text-lg border-0 bg-white/90 backdrop-blur-sm rounded-xl md:rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:bg-white placeholder-gray-500 shadow-inner pr-16"
+                    className="w-full px-6 py-4 text-lg border-0 bg-white/95 backdrop-blur-sm rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:bg-white placeholder-gray-500 shadow-inner pr-16 transition-all duration-300"
                     disabled={isLoading}
                   />
-                  <span className="absolute right-4 md:right-6 top-1/2 -translate-y-1/2 text-transparent bg-gradient-to-r from-yellow-500 to-orange-500 bg-clip-text font-bold text-sm md:text-base">
+                  <span className="absolute right-6 top-1/2 -translate-y-1/2 text-transparent bg-gradient-to-r from-yellow-500 to-orange-500 bg-clip-text font-bold text-base">
                     .pepu
                   </span>
                 </div>
                 <button
                   onClick={checkAvailability}
                   disabled={isLoading}
-                  className="px-6 md:px-8 py-3 md:py-4 bg-gradient-to-r from-black to-gray-800 text-white rounded-xl md:rounded-2xl hover:from-gray-800 hover:to-black transition-all duration-300 flex items-center justify-center gap-2 font-medium shadow-lg hover:shadow-xl transform active:scale-95 min-w-[120px]"
+                  className="px-8 py-4 bg-gradient-to-r from-black to-gray-800 text-white rounded-2xl hover:from-gray-800 hover:to-black transition-all duration-300 flex items-center justify-center gap-2 font-medium shadow-lg hover:shadow-xl transform active:scale-95 min-w-[140px]"
                 >
-                  <Search className="w-4 h-4 md:w-5 md:h-5" />
+                  <Search className="w-5 h-5" />
                   <span className="hidden md:inline">{isLoading ? 'Searching...' : 'Search'}</span>
                 </button>
               </div>
 
               {availability && (
-                <div className={`text-base md:text-lg font-bold transition-all duration-300 ${
-                  availability.includes('available') ? 'text-transparent bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text' : 
-                  availability.includes('taken') ? 'text-transparent bg-gradient-to-r from-red-600 to-rose-600 bg-clip-text' : 
-                  'text-transparent bg-gradient-to-r from-orange-600 to-yellow-600 bg-clip-text'
-                }`}>
-                  {availability}
+                <div className="space-y-4">
+                  <div className={`text-lg font-bold transition-all duration-300 ${
+                    availability.includes('available') ? 'text-transparent bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text' : 
+                    availability.includes('taken') ? 'text-transparent bg-gradient-to-r from-red-600 to-rose-600 bg-clip-text' : 
+                    'text-transparent bg-gradient-to-r from-orange-600 to-yellow-600 bg-clip-text'
+                  }`}>
+                    {availability}
+                  </div>
+                  
+                  {/* Clickable taken domain */}
+                  {availability.includes('taken') && takenDomainInfo && (
+                    <div className="flex justify-center">
+                      <button
+                        onClick={handleDomainInfoClick}
+                        className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-red-100 to-rose-100 hover:from-red-200 hover:to-rose-200 border border-red-300 rounded-xl transition-all duration-300 hover:shadow-lg group"
+                      >
+                        <span className="text-lg font-bold text-transparent bg-gradient-to-r from-yellow-600 to-orange-600 bg-clip-text">
+                          {takenDomainInfo.name}
+                        </span>
+                        <User className="w-4 h-4 text-red-600 group-hover:scale-110 transition-transform" />
+                      </button>
+                    </div>
+                  )}
                 </div>
               )}
 
@@ -339,7 +432,7 @@ const Index = () => {
               {canRegister && (
                 <button
                   onClick={handleRegister}
-                  className="w-full px-4 md:px-6 py-3 md:py-4 bg-gradient-to-r from-yellow-500 to-orange-500 text-black rounded-xl md:rounded-2xl hover:from-yellow-400 hover:to-orange-400 transition-all duration-300 font-bold text-base md:text-lg shadow-lg hover:shadow-xl transform active:scale-95"
+                  className="w-full px-6 py-4 bg-gradient-to-r from-yellow-500 to-orange-500 text-black rounded-2xl hover:from-yellow-400 hover:to-orange-400 transition-all duration-300 font-bold text-lg shadow-lg hover:shadow-xl transform active:scale-95"
                 >
                   Register for $5 USDC
                 </button>

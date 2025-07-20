@@ -55,6 +55,11 @@ export const PaymentVerification = ({
     hash,
   });
 
+  // Prevent modal from closing when clicking inside
+  const handleModalClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+  };
+
   const sendPayment = async () => {
     console.log('sendPayment called');
     console.log('Connected:', isConnected);
@@ -232,7 +237,10 @@ export const PaymentVerification = ({
   };
 
   return (
-    <div className="relative overflow-hidden bg-gradient-to-br from-white via-yellow-50/50 to-orange-50/50 border border-yellow-200/60 rounded-3xl p-8 shadow-2xl backdrop-blur-sm max-w-md mx-auto animate-fade-in">
+    <div 
+      className="relative overflow-hidden bg-gradient-to-br from-white via-yellow-50/50 to-orange-50/50 border border-yellow-200/60 rounded-3xl p-8 shadow-2xl backdrop-blur-sm max-w-md mx-auto animate-fade-in"
+      onClick={handleModalClick}
+    >
       {/* Floating decorative elements */}
       <div className="absolute top-4 right-4 w-16 h-16 bg-gradient-to-br from-yellow-400/20 to-orange-400/20 rounded-full blur-xl animate-pulse"></div>
       <div className="absolute bottom-4 left-4 w-10 h-10 bg-gradient-to-br from-orange-400/30 to-yellow-400/30 rounded-full blur-lg animate-bounce"></div>
