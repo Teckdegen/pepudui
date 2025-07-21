@@ -385,82 +385,84 @@ const Index = () => {
             />
           )}
 
-          {/* Enhanced Search section */}
-          <div className="bg-white/90 backdrop-blur-md rounded-3xl p-6 md:p-8 max-w-3xl mx-auto shadow-2xl border border-white/60 relative overflow-hidden">
-            <div className="space-y-6 relative">
-              <div className="flex flex-col md:flex-row gap-3">
-                <div className="flex-1 relative">
-                  <input
-                    type="text"
-                    placeholder="Search for a domain name..."
-                    value={searchQuery}
-                    onChange={(e) => handleSearchInput(e.target.value)}
-                    onKeyDown={handleSearchKeyDown}
-                    className="w-full px-6 py-4 text-lg border-0 bg-white/95 backdrop-blur-sm rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:bg-white placeholder-gray-500 shadow-inner pr-16 transition-all duration-300"
+          {/* Enhanced Search section - only show if user does not own a domain */}
+          {!hasOwnedDomain && (
+            <div className="bg-white/90 backdrop-blur-md rounded-3xl p-6 md:p-8 max-w-3xl mx-auto shadow-2xl border border-white/60 relative overflow-hidden">
+              <div className="space-y-6 relative">
+                <div className="flex flex-col md:flex-row gap-3">
+                  <div className="flex-1 relative">
+                    <input
+                      type="text"
+                      placeholder="Search for a domain name..."
+                      value={searchQuery}
+                      onChange={(e) => handleSearchInput(e.target.value)}
+                      onKeyDown={handleSearchKeyDown}
+                      className="w-full px-6 py-4 text-lg border-0 bg-white/95 backdrop-blur-sm rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:bg-white placeholder-gray-500 shadow-inner pr-16 transition-all duration-300"
+                      disabled={isLoading}
+                    />
+                    <span className="absolute right-6 top-1/2 -translate-y-1/2 text-transparent bg-gradient-to-r from-yellow-500 to-orange-500 bg-clip-text font-bold text-base">
+                      .pepu
+                    </span>
+                  </div>
+                  <button
+                    onClick={checkAvailability}
                     disabled={isLoading}
-                  />
-                  <span className="absolute right-6 top-1/2 -translate-y-1/2 text-transparent bg-gradient-to-r from-yellow-500 to-orange-500 bg-clip-text font-bold text-base">
-                    .pepu
-                  </span>
+                    className="px-8 py-4 bg-gradient-to-r from-black to-gray-800 text-white rounded-2xl hover:from-gray-800 hover:to-black transition-all duration-300 flex items-center justify-center gap-2 font-medium shadow-lg hover:shadow-xl transform active:scale-95 min-w-[140px]"
+                  >
+                    <Search className="w-5 h-5" />
+                    <span className="hidden md:inline">{isLoading ? 'Searching...' : 'Search'}</span>
+                  </button>
                 </div>
-                <button
-                  onClick={checkAvailability}
-                  disabled={isLoading}
-                  className="px-8 py-4 bg-gradient-to-r from-black to-gray-800 text-white rounded-2xl hover:from-gray-800 hover:to-black transition-all duration-300 flex items-center justify-center gap-2 font-medium shadow-lg hover:shadow-xl transform active:scale-95 min-w-[140px]"
-                >
-                  <Search className="w-5 h-5" />
-                  <span className="hidden md:inline">{isLoading ? 'Searching...' : 'Search'}</span>
-                </button>
-              </div>
 
-              {availability && (
-                <div className="space-y-4">
-                  <div className={`text-lg font-bold transition-all duration-300 ${
-                    availability.includes('available') ? 'text-transparent bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text' : 
-                    availability.includes('taken') ? 'text-transparent bg-gradient-to-r from-red-600 to-rose-600 bg-clip-text' : 
-                    'text-transparent bg-gradient-to-r from-orange-600 to-yellow-600 bg-clip-text'
-                  }`}>
-                    {availability}
-                  </div>
-                  
-                  {/* Enhanced taken domain display */}
-                  {availability.includes('taken') && takenDomainInfo && (
-                    <div className="flex justify-center">
-                      <DomainInfoCard
-                        domainInfo={takenDomainInfo}
-                        onViewDetails={handleDomainInfoClick}
-                      />
+                {availability && (
+                  <div className="space-y-4">
+                    <div className={`text-lg font-bold transition-all duration-300 ${
+                      availability.includes('available') ? 'text-transparent bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text' : 
+                      availability.includes('taken') ? 'text-transparent bg-gradient-to-r from-red-600 to-rose-600 bg-clip-text' : 
+                      'text-transparent bg-gradient-to-r from-orange-600 to-yellow-600 bg-clip-text'
+                    }`}>
+                      {availability}
                     </div>
-                  )}
-                </div>
-              )}
-
-              {error && <div className="text-red-600 font-medium">{error}</div>}
-
-              {/* Enhanced Register button with ownership check */}
-              {canRegister && (
-                <button
-                  onClick={handleRegister}
-                  className="w-full px-6 py-4 bg-gradient-to-r from-yellow-500 to-orange-500 text-black rounded-2xl hover:from-yellow-400 hover:to-orange-400 transition-all duration-300 font-bold text-lg shadow-lg hover:shadow-xl transform active:scale-95"
-                >
-                  Register for $5 USDC
-                </button>
-              )}
-
-              {/* Ownership warning */}
-              {availability.includes('available') && hasOwnedDomain && (
-                <div className="bg-gradient-to-r from-amber-50 to-yellow-50 border border-amber-200 rounded-2xl p-5 text-center">
-                  <div className="flex items-center justify-center mb-2">
-                    <AlertCircle className="w-5 h-5 mr-2 text-amber-600" />
-                    <p className="font-semibold text-amber-700">Registration Blocked</p>
+                    
+                    {/* Enhanced taken domain display */}
+                    {availability.includes('taken') && takenDomainInfo && (
+                      <div className="flex justify-center">
+                        <DomainInfoCard
+                          domainInfo={takenDomainInfo}
+                          onViewDetails={handleDomainInfoClick}
+                        />
+                      </div>
+                    )}
                   </div>
-                  <p className="text-sm text-amber-600">
-                    This wallet already owns <span className="font-medium">{ownedDomain}</span>. Only one domain per wallet is allowed.
-                  </p>
-                </div>
-              )}
+                )}
+
+                {error && <div className="text-red-600 font-medium">{error}</div>}
+
+                {/* Enhanced Register button with ownership check */}
+                {canRegister && (
+                  <button
+                    onClick={handleRegister}
+                    className="w-full px-6 py-4 bg-gradient-to-r from-yellow-500 to-orange-500 text-black rounded-2xl hover:from-yellow-400 hover:to-orange-400 transition-all duration-300 font-bold text-lg shadow-lg hover:shadow-xl transform active:scale-95"
+                  >
+                    Register for $5 USDC
+                  </button>
+                )}
+
+                {/* Ownership warning */}
+                {availability.includes('available') && hasOwnedDomain && (
+                  <div className="bg-gradient-to-r from-amber-50 to-yellow-50 border border-amber-200 rounded-2xl p-5 text-center">
+                    <div className="flex items-center justify-center mb-2">
+                      <AlertCircle className="w-5 h-5 mr-2 text-amber-600" />
+                      <p className="font-semibold text-amber-700">Registration Blocked</p>
+                    </div>
+                    <p className="text-sm text-amber-600">
+                      This wallet already owns <span className="font-medium">{ownedDomain}</span>. Only one domain per wallet is allowed.
+                    </p>
+                  </div>
+                )}
+              </div>
             </div>
-          </div>
+          )}
 
           {/* Stats section */}
           <div className="text-center">
