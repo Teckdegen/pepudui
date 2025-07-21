@@ -83,4 +83,5 @@ export const config = getDefaultConfig({
     [pepeUnchainedV2.id]: http('https://rpc-pepu-v2-mainnet-0.t.conduit.xyz'),
   },
   ssr: false,
+  multiInjectedProviderDiscovery: true,
 });
