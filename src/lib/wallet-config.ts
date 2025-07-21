@@ -34,7 +34,6 @@ import {
   bloomWallet,
   clvWallet,
   coin98Wallet,
-  coolWallet,
   dawnWallet,
   enkryptWallet,
   foxWallet,
@@ -76,7 +75,7 @@ export const pepeUnchainedV2 = defineChain({
   testnet: false,
 });
 
-// Enhanced configuration with all available wallets
+// Enhanced configuration with available wallets
 export const config = getDefaultConfig({
   appName: 'Pepu Name Service',
   projectId: 'c4f79cc821944d9680842e34466bfbd9',
@@ -107,7 +106,6 @@ export const config = getDefaultConfig({
       wallets: [
         ledgerWallet,
         trezorWallet,
-        coolWallet,
       ],
     },
     {
