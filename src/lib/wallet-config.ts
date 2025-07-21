@@ -1,3 +1,4 @@
+
 import { getDefaultConfig } from '@rainbow-me/rainbowkit';
 import { http } from 'wagmi';
 import { defineChain } from 'viem';
@@ -8,6 +9,8 @@ import {
   coinbaseWallet,
   walletConnectWallet,
   trustWallet,
+  ledgerWallet,
+  braveWallet,
   phantomWallet,
   okxWallet,
   rabbyWallet,
@@ -31,6 +34,7 @@ import {
   bloomWallet,
   clvWallet,
   coin98Wallet,
+  coolWallet,
   dawnWallet,
   enkryptWallet,
   foxWallet,
@@ -52,8 +56,6 @@ import {
   talismanWallet,
 } from '@rainbow-me/rainbowkit/wallets';
 
-import { mainnet, polygon, optimism, arbitrum, base } from 'wagmi/chains';
-
 // Define Pepe Unchained V2 network configuration
 export const pepeUnchainedV2 = defineChain({
   id: 97741,
@@ -74,14 +76,87 @@ export const pepeUnchainedV2 = defineChain({
   testnet: false,
 });
 
-// Enhanced configuration with available wallets
+// Enhanced configuration with all available wallets
 export const config = getDefaultConfig({
-  appName: 'Pepu Domain Service',
+  appName: 'Pepu Name Service',
   projectId: 'c4f79cc821944d9680842e34466bfbd9',
-  chains: [mainnet, polygon, optimism, arbitrum, base, pepeUnchainedV2],
+  chains: [pepeUnchainedV2],
   transports: {
     [pepeUnchainedV2.id]: http('https://rpc-pepu-v2-mainnet-0.t.conduit.xyz'),
   },
+  wallets: [
+    {
+      groupName: 'Popular',
+      wallets: [
+        injectedWallet,
+        metaMaskWallet,
+        rainbowWallet,
+        coinbaseWallet,
+        walletConnectWallet,
+        trustWallet,
+        phantomWallet,
+        okxWallet,
+        rabbyWallet,
+        zerionWallet,
+        bitgetWallet,
+        uniswapWallet,
+      ],
+    },
+    {
+      groupName: 'Hardware',
+      wallets: [
+        ledgerWallet,
+        trezorWallet,
+        coolWallet,
+      ],
+    },
+    {
+      groupName: 'Mobile',
+      wallets: [
+        imTokenWallet,
+        tokenPocketWallet,
+        coin98Wallet,
+        foxWallet,
+        mewWallet,
+        kaikasWallet,
+        magicEdenWallet,
+        clvWallet,
+        binanceWallet,
+        bybitWallet,
+        gateWallet,
+        subWallet,
+      ],
+    },
+    {
+      groupName: 'Browser',
+      wallets: [
+        braveWallet,
+        frameWallet,
+        enkryptWallet,
+        dawnWallet,
+        frontierWallet,
+        xdefiWallet,
+        oneInchWallet,
+        tokenaryWallet,
+        safeWallet,
+        coreWallet,
+        roninWallet,
+        argentWallet,
+        bitverseWallet,
+        bloomWallet,
+        bitskiWallet,
+        bifrostWallet,
+        krakenWallet,
+        kresusWallet,
+        nestWallet,
+        oktoWallet,
+        omniWallet,
+        tahoWallet,
+        talismanWallet,
+        unstoppableWallet,
+      ],
+    },
+  ],
   ssr: false,
   multiInjectedProviderDiscovery: true,
 });
