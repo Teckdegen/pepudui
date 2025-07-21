@@ -1,4 +1,3 @@
-
 import { getDefaultConfig } from '@rainbow-me/rainbowkit';
 import { http } from 'wagmi';
 import { defineChain } from 'viem';
@@ -55,6 +54,8 @@ import {
   talismanWallet,
 } from '@rainbow-me/rainbowkit/wallets';
 
+import { mainnet, polygon, optimism, arbitrum, base } from 'wagmi/chains';
+
 // Define Pepe Unchained V2 network configuration
 export const pepeUnchainedV2 = defineChain({
   id: 97741,
@@ -77,9 +78,9 @@ export const pepeUnchainedV2 = defineChain({
 
 // Enhanced configuration with available wallets
 export const config = getDefaultConfig({
-  appName: 'Pepu Name Service',
+  appName: 'Pepu Domain Service',
   projectId: 'c4f79cc821944d9680842e34466bfbd9',
-  chains: [pepeUnchainedV2],
+  chains: [mainnet, polygon, optimism, arbitrum, base, pepeUnchainedV2],
   transports: {
     [pepeUnchainedV2.id]: http('https://rpc-pepu-v2-mainnet-0.t.conduit.xyz'),
   },
