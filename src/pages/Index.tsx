@@ -385,13 +385,8 @@ const Index = () => {
             />
           )}
 
-          {/* Show owned domain message OR search section */}
-          {hasOwnedDomain ? (
-            <div className="bg-white/90 backdrop-blur-md rounded-3xl p-6 md:p-8 max-w-3xl mx-auto shadow-2xl border border-white/60 text-center">
-              <h3 className="text-2xl font-bold text-transparent bg-gradient-to-r from-gray-800 to-black bg-clip-text mb-2">You Already Own a Domain</h3>
-              <p className="text-gray-600">Your wallet is associated with <span className="font-bold text-black">{ownedDomain}</span>. Only one domain is allowed per wallet.</p>
-            </div>
-          ) : (
+          {/* Enhanced Search section - only show if user does not own a domain */}
+          {!hasOwnedDomain && (
             <div className="bg-white/90 backdrop-blur-md rounded-3xl p-6 md:p-8 max-w-3xl mx-auto shadow-2xl border border-white/60 relative overflow-hidden">
               <div className="space-y-6 relative">
                 <div className="flex flex-col md:flex-row gap-3">
