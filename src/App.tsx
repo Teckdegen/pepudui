@@ -1,3 +1,4 @@
+
 import '@rainbow-me/rainbowkit/styles.css';
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -25,6 +26,8 @@ const App = () => (
       <RainbowKitProvider 
         locale="en-US"
         showRecentTransactions={true}
+        modalSize="compact"
+        initialChain={97741}
       >
         <TooltipProvider>
           <Toaster />
