@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useAccount, useWriteContract, useWaitForTransactionReceipt, useSwitchChain } from 'wagmi';
 import { parseUnits, Address } from 'viem';
@@ -262,7 +261,7 @@ export const PaymentVerification = ({
       </div>
 
       {/* Scrollable Content */}
-      <ScrollArea className="h-full max-h-[60vh]">
+      <ScrollArea className="max-h-[60vh]">
         <div className="p-6 space-y-6">
           {/* Domain display */}
           <div className="space-y-4 text-center">
