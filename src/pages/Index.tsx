@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useAccount } from 'wagmi';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
-import { Search, Sparkles, Star, Settings, Clock, User, Calendar, AlertCircle } from 'lucide-react';
+import { Search, Sparkles, Star, Settings, Clock, User, Calendar, AlertCircle, Shield } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { formatDomain, isValidFullDomain, hasBannedWords, extractDomainName } from '../lib/domain-utils';
 import { PaymentVerification } from '../components/PaymentVerification';
