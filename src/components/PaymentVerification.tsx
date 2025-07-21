@@ -32,7 +32,7 @@ const USDC_ABI = [
   }
 ] as const;
 
-export const PaymentVerification: React.FC<PaymentVerificationProps> = ({ 
+export const PaymentVerification = ({ 
   walletAddress, 
   domainName, 
   onSuccess, 
@@ -40,7 +40,7 @@ export const PaymentVerification: React.FC<PaymentVerificationProps> = ({
 }: PaymentVerificationProps) => {
   const { isConnected, address, chainId } = useAccount();
   const [isProcessing, setIsProcessing] = useState(false);
-  const [paymentStatus, setPaymentStatus] = useState<string>('Awaiting payment confirmation...');
+  const [paymentStatus, setPaymentStatus] = useState<string>('');
   const [txHash, setTxHash] = useState<string | null>(null);
 
   const { switchChain, isPending: isSwitchingChain } = useSwitchChain();
@@ -175,8 +175,6 @@ export const PaymentVerification: React.FC<PaymentVerificationProps> = ({
   }, [writeError, onError]);
 
   const verifyPayment = async (transactionHash: string) => {
-    setIsProcessing(true);
-    setPaymentStatus('Verifying payment and registering domain...');
     try {
       console.log('Verifying payment with hash:', transactionHash);
       
