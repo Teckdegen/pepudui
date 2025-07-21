@@ -137,7 +137,7 @@ export const PaymentVerification = ({
   };
 
   // Handle transaction hash
-  useEffect(() => {
+  useEffect(() => re 
     if (hash) {
       console.log('Transaction hash received:', hash);
       setTxHash(hash);
@@ -245,11 +245,11 @@ export const PaymentVerification = ({
 
   return (
     <div 
-      className="relative w-full max-w-md max-h-[90vh] overflow-hidden bg-white rounded-3xl shadow-2xl"
+      className="relative w-full max-w-md max-h-[90vh] overflow-hidden bg-white rounded-3xl shadow-2xl flex flex-col flex flex-col"
       onClick={handleModalClick}
     >
       {/* Header - Fixed */}
-      <div className="relative bg-gradient-to-br from-yellow-50 to-orange-50 p-6 border-b border-yellow-200/60">
+      <div className="relative bg-gradient-to-br from-yellow-50 to-orange-50 p-6 border-b border-yellow-200/60 flex-shrink-0 flex-shrink-0">
         <div className="text-center">
           <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-3xl mb-4 shadow-xl relative overflow-hidden">
             <div className="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent"></div>
@@ -261,7 +261,7 @@ export const PaymentVerification = ({
       </div>
 
       {/* Scrollable Content */}
-      <ScrollArea className="max-h-[60vh]">
+      <ScrollArea className="fleeggrow
         <div className="p-6 space-y-6">
           {/* Domain display */}
           <div className="space-y-4 text-center">
@@ -336,7 +336,7 @@ export const PaymentVerification = ({
       </ScrollArea>
 
       {/* Fixed Footer with Action Button */}
-      <div className="border-t border-gray-200 p-6 bg-white">
+      <div className="border-t border-gray-200 p-6 bg-white flex-shrink-0 flex-shrink-0">
         <button
           onClick={sendPayment}
           disabled={isButtonDisabled}
