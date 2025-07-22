@@ -274,21 +274,13 @@ const Index = () => {
       <div className="absolute inset-0 bg-gradient-to-b from-blue-50/20 via-transparent to-yellow-50/20 pointer-events-none" />
 
       {/* Header */}
-      <header className="relative z-10 p-3 md:p-6 backdrop-blur-sm">
-        <div className="max-w-6xl mx-auto flex items-center justify-between">
+      <header className="sticky top-0 z-20 w-full bg-white shadow-md">
+        <div className="max-w-6xl mx-auto flex items-center justify-between py-3 md:py-4 px-3 md:px-6">
           <div className="flex items-center gap-2 md:gap-4">
-            <div className="relative">
-              <img src="/lovable-uploads/90659ea0-5d26-4342-9a87-0c004e40af4d.png" alt="Pepu" className="w-8 h-8 md:w-12 md:h-12 rounded-full shadow-lg" />
-              <div className="absolute -top-1 -right-1 w-3 h-3 md:w-4 md:h-4 bg-yellow-400 rounded-full animate-pulse"></div>
-            </div>
-            <div>
-              <h1 className="text-lg md:text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                Pepu Names
-              </h1>
-              <p className="text-xs text-gray-500 hidden md:block">Decentralized Identity</p>
-            </div>
+            <img src="/assets/pepe-icon.png" alt="Pepu Logo" className="w-10 h-10 md:w-12 md:h-12 rounded-full shadow-lg" />
+            <span className="text-lg md:text-2xl font-bold text-purple-700">Pepu Names</span>
           </div>
-          <div className="bg-white/80 backdrop-blur-sm rounded-xl md:rounded-2xl p-1 shadow-lg">
+          <div>
             <ConnectButton />
           </div>
         </div>
@@ -296,7 +288,7 @@ const Index = () => {
 
       {/* Main content */}
       <main className="relative z-10 max-w-4xl mx-auto px-3 md:px-6 py-6 md:py-12">
-        <div className="text-center space-y-6 md:space-y-12">
+        <div className="white-content-container text-center space-y-6 md:space-y-12">
           {/* Hero section */}
           <div className="space-y-4 md:space-y-8">
             <div className="relative">
