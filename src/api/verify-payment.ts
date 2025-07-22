@@ -2,7 +2,7 @@ import { supabase } from '@/integrations/supabase/client';
 
 const TREASURY_WALLET = '0x3a5149Ae34B99087fF51EC374EeC371623789Cd0'; // Fixed - now 42 characters
 const PEPU_RPC_URL = 'https://eth-sepolia.public.blastapi.io';
-const REQUIRED_AMOUNT = '1'; // 5 USDC (6 decimals for USDC)
+const REQUIRED_AMOUNT = '5'; // 5 USDC (6 decimals for USDC)
 const USDC_CONTRACT_ADDRESS = '0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238'; // TODO: Replace this with the actual USDC contract address on Pepe Unchained V2
 
 async function callPepuRPC(method: string, params: any[] = []) {
@@ -91,8 +91,6 @@ async function sendTelegramNotification(wallet: string, name: string, txHash: st
 export async function POST(request: Request) {
   const { wallet, name, txHash } = await request.json();
 
-  console.log('[verify-payment] Incoming:', { wallet, name, txHash });
-
   if (!wallet || !name) {
     return Response.json({ success: false, error: 'Wallet and name are required' });
   }
@@ -102,6 +100,9 @@ export async function POST(request: Request) {
   if (!isValid) {
     return Response.json({ success: false, error: 'Blockchain payment verification failed' });
   }
+
+  // Log domain registration step
+  console.log('Domain registering...');
 
   // Prepare timestamps
   const now = new Date();
