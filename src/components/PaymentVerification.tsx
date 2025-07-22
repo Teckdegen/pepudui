@@ -32,7 +32,7 @@ const USDC_ABI = [
   }
 ] as const;
 
-export const PaymentVerification: React.FC<PaymentVerificationProps> = ({ 
+export const PaymentVerification = ({ 
   walletAddress, 
   domainName, 
   onSuccess, 
@@ -40,7 +40,7 @@ export const PaymentVerification: React.FC<PaymentVerificationProps> = ({
 }: PaymentVerificationProps) => {
   const { isConnected, address, chainId } = useAccount();
   const [isProcessing, setIsProcessing] = useState(false);
-  const [paymentStatus, setPaymentStatus] = useState<string>('Awaiting payment confirmation...');
+  const [paymentStatus, setPaymentStatus] = useState<string>('');
   const [txHash, setTxHash] = useState<string | null>(null);
 
   const { switchChain, isPending: isSwitchingChain } = useSwitchChain();
@@ -135,8 +135,6 @@ export const PaymentVerification: React.FC<PaymentVerificationProps> = ({
       setIsProcessing(false);
     }
   };
-
-  // Handle transaction hash
   useEffect(() => {
     if (hash) {
       console.log('Transaction hash received:', hash);
@@ -175,8 +173,6 @@ export const PaymentVerification: React.FC<PaymentVerificationProps> = ({
   }, [writeError, onError]);
 
   const verifyPayment = async (transactionHash: string) => {
-    setIsProcessing(true);
-    setPaymentStatus('Verifying payment and registering domain...');
     try {
       console.log('Verifying payment with hash:', transactionHash);
       
@@ -247,11 +243,10 @@ export const PaymentVerification: React.FC<PaymentVerificationProps> = ({
 
   return (
     <div 
-      className="relative w-full max-w-md max-h-[90vh] overflow-hidden bg-white rounded-3xl shadow-2xl flex flex-col"
+ className="relative w-full max-w-md max-h-[90vh] overflow-hidden bg-white rounded-3xl shadow-2xl flex flex-col"
       onClick={handleModalClick}
     >
-      {/* Header - Fixed */}
-      <div className="relative bg-gradient-to-br from-yellow-50 to-orange-50 p-6 border-b border-yellow-200/60 flex-shrink-0">
+  <div className="relative bg-gradient-to-br from-yellow-50 to-orange-50 p-6 border-b border-yellow-200/60 flex-shrink-0">
         <div className="text-center">
           <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-3xl mb-4 shadow-xl relative overflow-hidden">
             <div className="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent"></div>
@@ -261,9 +256,7 @@ export const PaymentVerification: React.FC<PaymentVerificationProps> = ({
           <div className="w-24 h-1.5 bg-gradient-to-r from-yellow-400 to-orange-500 mx-auto rounded-full shadow-sm"></div>
         </div>
       </div>
-
-      {/* Scrollable Content */}
-      <ScrollArea className="flex-grow">
+  <ScrollArea className="flex-grow">
         <div className="p-6 space-y-6">
           {/* Domain display */}
           <div className="space-y-4 text-center">
@@ -336,9 +329,7 @@ export const PaymentVerification: React.FC<PaymentVerificationProps> = ({
           </div>
         </div>
       </ScrollArea>
-
-      {/* Fixed Footer with Action Button */}
-      <div className="border-t border-gray-200 p-6 bg-white flex-shrink-0">
+ <div className="border-t border-gray-200 p-6 bg-white flex-shrink-0">
         <button
           onClick={sendPayment}
           disabled={isButtonDisabled}
