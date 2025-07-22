@@ -26,14 +26,14 @@ export type Database = {
           updated_at: string
         }
         Insert: {
-          created_at?: string
-          expiry?: string
+          created_at: string
+          expiry: string
           id?: number
           name: string
           owner: string
-          paid?: boolean
-          transaction_hash?: string | null
-          updated_at?: string
+          paid: boolean
+          transaction_hash: string | null
+          updated_at: string
         }
         Update: {
           created_at?: string
