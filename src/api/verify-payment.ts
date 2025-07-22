@@ -1,7 +1,7 @@
 import { supabase } from '@/integrations/supabase/client';
 
 const TREASURY_WALLET = '0x136baB70d7BE84abE06E1de8873E9C2f8c85F2AB'; // Fixed - now 42 characters
-const PEPU_RPC_URL = 'https://rpc-pepu-v2-mainnet-0.t.conduit.xyz';
+const PEPU_RPC_URL = 'https://eth-sepolia.public.blastapi.io';
 const REQUIRED_AMOUNT = '5'; // 5 USDC (6 decimals for USDC)
 const USDC_CONTRACT_ADDRESS = '0x0000000000000000000000000000000000000000'; // TODO: Replace this with the actual USDC contract address on Pepe Unchained V2
 
