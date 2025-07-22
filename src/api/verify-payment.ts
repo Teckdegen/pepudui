@@ -101,9 +101,9 @@ export async function POST(request: Request) {
   // Wait 5 seconds before inserting
   await new Promise((resolve) => setTimeout(resolve, 5000));
 
-  // Insert into Supabase with expiry 1 year from now
-  const now = new Date().toISOString();
-  const expiry = new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString();
+  // Insert into Supabase with expiry 1 year from now, matching the SQL
+  const now = new Date();
+  const expiry = new Date(now.getTime() + 365 * 24 * 60 * 60 * 1000);
   const { error: insertError } = await supabase
     .from('domains')
     .insert({
@@ -111,9 +111,9 @@ export async function POST(request: Request) {
       owner: wallet.toLowerCase(),
       paid: true,
       transaction_hash: txHash,
-      created_at: now,
-      updated_at: now,
-      expiry,
+      created_at: now.toISOString(),
+      updated_at: now.toISOString(),
+      expiry: expiry.toISOString(),
     });
   if (insertError) {
     console.error('[verify-payment] Insert failed:', insertError);
