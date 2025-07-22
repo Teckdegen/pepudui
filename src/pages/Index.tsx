@@ -247,7 +247,7 @@ const Index = () => {
   const canRegister = availability.includes('available') && selectedDomain && !hasOwnedDomain && !isLimitReached;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-white via-blue-50/30 to-yellow-50/30 relative overflow-hidden">
+    <div className="min-h-screen bg-purple-100 relative overflow-hidden">
       {/* Floating domains background - hidden on small screens for performance */}
       <div className="hidden md:block">
         {FLOATING_DOMAINS.map((domain, index) => (
@@ -276,10 +276,7 @@ const Index = () => {
       {/* Header */}
       <header className="sticky top-0 z-20 w-full bg-white shadow-md">
         <div className="max-w-6xl mx-auto flex items-center justify-between py-3 md:py-4 px-3 md:px-6">
-          <div className="flex items-center gap-2 md:gap-4">
-            <img src="/assets/pepe-icon.png" alt="Pepu Logo" className="w-10 h-10 md:w-12 md:h-12 rounded-full shadow-lg" />
-            <span className="text-lg md:text-2xl font-bold text-purple-700">Pepu Names</span>
-          </div>
+          <span className="text-lg md:text-2xl font-bold text-purple-700">Pepu Names</span>
           <div>
             <ConnectButton />
           </div>
