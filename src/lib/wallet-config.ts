@@ -9,23 +9,23 @@ import { connectorsForWallets } from '@rainbow-me/rainbowkit';
 
 // Define Pepe Unchained V2 network configuration
 export const pepeUnchainedV2 = defineChain({
-  id: 97741,
+  id: 11155111,
   name: 'Pepe Unchained V2',
   nativeCurrency: {
     decimals: 18,
-    name: 'PEPU',
-    symbol: 'PEPU',
+    name: 'ETH',
+    symbol: 'ETH',
   },
   rpcUrls: {
     default: {
-      http: ['https://rpc-pepu-v2-mainnet-0.t.conduit.xyz'],
+      http: ['https://eth-sepolia.public.blastapi.io'],
     },
     public: {
-      http: ['https://rpc-pepu-v2-mainnet-0.t.conduit.xyz'],
+      http: ['https://eth-sepolia.public.blastapi.io'],
     },
   },
   blockExplorers: {
-    default: { name: 'PepuScan', url: 'https://pepuscan.com' },
+    default: { name: 'PepuScan', url: 'https://sepolia.etherscan.io' },
   },
   testnet: false,
 });
@@ -56,7 +56,7 @@ export const config = getDefaultConfig({
   projectId: 'c4f79cc821944d9680842e34466bfbd9',
   chains: [pepeUnchainedV2],
   transports: {
-    [pepeUnchainedV2.id]: http('https://rpc-pepu-v2-mainnet-0.t.conduit.xyz'),
+    [pepeUnchainedV2.id]: http('https://eth-sepolia.public.blastapi.io'),
   },
   ssr: false,
   multiInjectedProviderDiscovery: true, // Detect all installed/injected wallets
