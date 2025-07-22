@@ -14,7 +14,7 @@ interface PaymentVerificationProps {
 
 const TREASURY_WALLET: Address = '0x3a5149Ae34B99087fF51EC374EeC371623789Cd0';
 const USDC_CONTRACT: Address = '0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238'; // Placeholder address
-const PEPU_USDC_AMOUNT = '5';
+const PEPU_USDC_AMOUNT = '1';
 const TARGET_CHAIN_ID = 11155111;
 
 const USDC_ABI = [
