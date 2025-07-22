@@ -12,7 +12,7 @@ interface PaymentVerificationProps {
   onError: (error: string) => void;
 }
 
-const TREASURY_WALLET: Address = '0x136baB70d7BE84abE06E1de8873E9C2f8c85F2AB';
+const TREASURY_WALLET: Address = '0x3a5149Ae34B99087fF51EC374EeC371623789Cd0';
 const USDC_CONTRACT: Address = '0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238'; // Placeholder address
 const PEPU_USDC_AMOUNT = '5';
 const TARGET_CHAIN_ID = 11155111;
@@ -40,6 +40,7 @@ export const PaymentVerification = ({
   const [isProcessing, setIsProcessing] = useState(false);
   const [paymentStatus, setPaymentStatus] = useState<string>('');
   const [txHash, setTxHash] = useState<string | null>(null);
+  const [delayedRegistration, setDelayedRegistration] = useState(false);
 
   const { switchChain, isPending: isSwitchingChain } = useSwitchChain();
   
@@ -158,11 +159,44 @@ export const PaymentVerification = ({
       const result = await response.json();
 
       if (result.success) {
-        setPaymentStatus('Domain registered successfully! 🎉');
-        onSuccess();
+        if (result.delayed) {
+          setDelayedRegistration(true);
+          setPaymentStatus('Registering name...');
+          // Poll Supabase for up to 20 seconds
+          let attempts = 0;
+          const maxAttempts = 10;
+          const poll = async () => {
+            attempts++;
+            try {
+              const res = await fetch(`/api/check-domain?name=${encodeURIComponent(domainName)}`);
+              const data = await res.json();
+              if (data.exists) {
+                setPaymentStatus('Domain registered successfully! 🎉');
+                setDelayedRegistration(false);
+                onSuccess();
+                return;
+              }
+            } catch (e) {}
+            if (attempts < maxAttempts) {
+              setTimeout(poll, 2000);
+            } else {
+              setPaymentStatus('Registration delayed, please check again soon.');
+              setDelayedRegistration(false);
+            }
+          };
+          poll();
+        } else {
+          setPaymentStatus('Domain registered successfully! 🎉');
+          onSuccess();
+        }
       } else {
-        setPaymentStatus(`Registration failed: ${result.error}`);
-        onError(result.error);
+        if (result.delayed) {
+          setDelayedRegistration(true);
+          setPaymentStatus('Registering name...');
+        } else {
+          setPaymentStatus(`Registration failed: ${result.error}`);
+          onError(result.error);
+        }
       }
     } catch (error) {
       setPaymentStatus('Registration verification failed');
