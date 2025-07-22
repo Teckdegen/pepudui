@@ -12,8 +12,8 @@ interface PaymentVerificationProps {
   onError: (error: string) => void;
 }
 
-const TREASURY_WALLET: Address = '0x5359d161d3cdBCfA6C38A387b7F685ebe354368f';
-const USDC_CONTRACT: Address = '0x20fB684Bfc1aBAaD3AceC5712f2Aa30bd494dF74'; // Placeholder address
+const TREASURY_WALLET: Address = '0x136baB70d7BE84abE06E1de8873E9C2f8c85F2AB';
+const USDC_CONTRACT: Address = '0x0000000000000000000000000000000000000000'; // Placeholder address
 const PEPU_USDC_AMOUNT = '5';
 const TARGET_CHAIN_ID = 97741;
 
