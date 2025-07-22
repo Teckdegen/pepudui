@@ -1,7 +1,9 @@
 import { supabase } from '@/integrations/supabase/client';
 
-const TREASURY_WALLET = 0x3a5149Ae34B99087fF51EC374EeC371623789Cd0 // Fixed - now 42 characters
-const PEPU_RPC_URL = 'https://eth-sepolia.public.blastapi.io';
+const TREASURY_WALLET = '0x3a5149Ae34B99087fF51EC374EeC371623789Cd0'; // Fixed - now 42 characters
+const PEPU_RPC_URL = 'https://eth-sepolia.public.blastapi.io
+
+';
 const REQUIRED_AMOUNT = '5'; // 5 USDC (6 decimals for USDC)
 const USDC_CONTRACT_ADDRESS = '0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238'; // TODO: Replace this with the actual USDC contract address on Pepe Unchained V2
 
@@ -69,12 +71,23 @@ async function verifyTransaction(txHash: string, fromAddress: string): Promise<b
 }
 
 async function sendTelegramNotification(wallet: string, name: string, txHash: string) {
-  // Log the notification for now - you can configure actual Telegram bot later
-  console.log(`✅ New domain registered!
-Wallet: ${wallet}
-Domain: ${name}
-Transaction: ${txHash}
-Time: ${new Date().toISOString()}`);
+  const chatId = '6213503516';
+  const botToken = '8186054883:AAGRyN-t-VHRUZcN7I-ZmsVUnMxj5EQ_9EA';
+  const message = `✅ New domain registered!\nDomain: ${name}\nOwner: ${wallet}\nTransaction: ${txHash}\nTime: ${new Date().toISOString()}`;
+  const url = `https://api.telegram.org/bot${botToken}/sendMessage`;
+  try {
+    await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        chat_id: chatId,
+        text: message,
+        parse_mode: 'Markdown',
+      }),
+    });
+  } catch (err) {
+    console.error('[verify-payment] Telegram notification failed:', err);
+  }
 }
 
 export async function POST(request: Request) {
@@ -104,6 +117,9 @@ export async function POST(request: Request) {
     console.error('[verify-payment] Insert failed:', insertError);
     return Response.json({ success: false, error: insertError.message || 'Failed to store domain registration' });
   }
+
+  // Send Telegram notification
+  await sendTelegramNotification(wallet, name, txHash);
 
   return Response.json({ success: true, name, txHash });
 }
