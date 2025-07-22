@@ -125,6 +125,8 @@ export const PaymentVerification = ({
           TREASURY_WALLET,
           parseUnits(PEPU_USDC_AMOUNT, 6) // USDC has 6 decimals
         ],
+        chain: pepeUnchainedV2,
+        account: address,
       });
     } catch (error) {
       console.error('Transaction error:', error);
