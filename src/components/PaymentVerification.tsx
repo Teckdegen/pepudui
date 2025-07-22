@@ -59,6 +59,7 @@ export const PaymentVerification = ({
   };
 
   const sendPayment = async () => {
+    console.log('sendPayment called', { isConnected, address, chainId });
     if (!isConnected || !address) {
       onError('Please connect your wallet');
       return;
@@ -69,7 +70,9 @@ export const PaymentVerification = ({
     if (chainId !== TARGET_CHAIN_ID) {
       try {
         setPaymentStatus('Switching to Pepe Unchained V2 network...');
-        await switchChain({ chainId: TARGET_CHAIN_ID });
+        console.log('Attempting to switch chain to', TARGET_CHAIN_ID);
+        const result = await switchChain({ chainId: TARGET_CHAIN_ID });
+        console.log('Switch chain result:', result);
         setTimeout(() => {
           executeTransaction();
         }, 1000);
