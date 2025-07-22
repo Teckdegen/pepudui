@@ -1,6 +1,6 @@
 import { supabase } from '@/integrations/supabase/client';
 
-const TREASURY_WALLET = '0x3a5149Ae34B99087fF51EC374EeC371623789Cd0'; // Fixed - now 42 characters
+const TREASURY_WALLET = 0x3a5149Ae34B99087fF51EC374EeC371623789Cd0 // Fixed - now 42 characters
 const PEPU_RPC_URL = 'https://eth-sepolia.public.blastapi.io';
 const REQUIRED_AMOUNT = '5'; // 5 USDC (6 decimals for USDC)
 const USDC_CONTRACT_ADDRESS = '0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238'; // TODO: Replace this with the actual USDC contract address on Pepe Unchained V2
@@ -86,22 +86,7 @@ export async function POST(request: Request) {
     return Response.json({ success: false, error: 'Wallet and name are required' });
   }
 
-  // Payment verification logic
-  if (!txHash) {
-    return Response.json({ success: false, error: 'Transaction hash required for verification' });
-  }
-
-  const isValidPayment = await verifyTransaction(txHash, wallet);
-  console.log('[verify-payment] Payment verified:', isValidPayment);
-
-  if (!isValidPayment) {
-    return Response.json({ success: false, error: 'Invalid or insufficient payment transaction' });
-  }
-
-  // Wait 5 seconds before inserting
-  await new Promise((resolve) => setTimeout(resolve, 5000));
-
-  // Insert into Supabase with expiry 1 year from now, matching the SQL
+  // Insert into Supabase immediately, matching your SQL
   const now = new Date();
   const expiry = new Date(now.getTime() + 365 * 24 * 60 * 60 * 1000);
   const { error: insertError } = await supabase
