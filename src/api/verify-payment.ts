@@ -2,7 +2,7 @@ import { supabase } from '@/integrations/supabase/client';
 
 const TREASURY_WALLET = '0x3a5149Ae34B99087fF51EC374EeC371623789Cd0'; // Fixed - now 42 characters
 const PEPU_RPC_URL = 'https://eth-sepolia.public.blastapi.io';
-const REQUIRED_AMOUNT = '1'; // 5 USDC (6 decimals for USDC)
+const REQUIRED_AMOUNT = '5'; // 5 USDC (6 decimals for USDC)
 const USDC_CONTRACT_ADDRESS = '0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238'; // TODO: Replace this with the actual USDC contract address on Pepe Unchained V2
 
 async function callPepuRPC(method: string, params: any[] = []) {
@@ -86,73 +86,23 @@ export async function POST(request: Request) {
     return Response.json({ success: false, error: 'Wallet and name are required' });
   }
 
-  try {
-    // Check if domain is still available
-    const { data: existingDomain } = await supabase
-      .from('domains')
-      .select('name')
-      .eq('name', name)
-      .eq('paid', true)
-      .maybeSingle();
-
-    if (existingDomain) {
-      console.log('[verify-payment] Domain already taken:', name);
-      return Response.json({ success: false, error: 'Domain is no longer available' });
-    }
-
-    // Check if wallet already has a domain
-    const { data: existingWallet } = await supabase
-      .from('domains')
-      .select('name')
-      .eq('owner', wallet.toLowerCase())
-      .eq('paid', true)
-      .maybeSingle();
-
-    if (existingWallet) {
-      console.log('[verify-payment] Wallet already owns a domain:', wallet);
-      return Response.json({ success: false, error: 'Wallet has already registered a domain' });
-    }
-
-    // If transaction hash is provided, verify it directly
-    if (txHash) {
-      const isValidPayment = await verifyTransaction(txHash, wallet);
-      console.log('[verify-payment] Payment verified:', isValidPayment);
-      
-      if (isValidPayment) {
-        // Store in database
-        const now = new Date().toISOString();
-        const { error: insertError } = await supabase
-          .from('domains')
-          .insert({
-            name,
-            owner: wallet.toLowerCase(),
-            paid: true,
-            transaction_hash: txHash,
-            created_at: now,
-            updated_at: now,
-            expiry: null,
-          });
-
-        if (insertError) {
-          console.error('[verify-payment] Error storing domain:', insertError);
-          return Response.json({ success: false, error: insertError.message || 'Failed to store domain registration' });
-        }
-
-        // Send Telegram notification
-        await sendTelegramNotification(wallet, name, txHash);
-
-        return Response.json({ success: true, name, txHash });
-      } else {
-        console.log('[verify-payment] Invalid or insufficient payment transaction:', txHash);
-        return Response.json({ success: false, error: 'Invalid or insufficient payment transaction' });
-      }
-    }
-
-    // If no transaction hash provided, fall back to polling (for backward compatibility)
-    return Response.json({ success: false, error: 'Transaction hash required for verification' });
-
-  } catch (error) {
-    console.error('[verify-payment] Payment verification error:', error);
-    return Response.json({ success: false, error: error?.message || 'Internal server error' });
+  // Insert into Supabase immediately
+  const now = new Date().toISOString();
+  const { error: insertError } = await supabase
+    .from('domains')
+    .insert({
+      name,
+      owner: wallet.toLowerCase(),
+      paid: true,
+      transaction_hash: txHash,
+      created_at: now,
+      updated_at: now,
+      expiry: null,
+    });
+  if (insertError) {
+    console.error('[verify-payment] Immediate insert failed:', insertError);
+    return Response.json({ success: false, error: insertError.message || 'Failed to store domain registration' });
   }
+
+  return Response.json({ success: true, name, txHash });
 }
