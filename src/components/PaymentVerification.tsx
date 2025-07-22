@@ -180,7 +180,7 @@ export const PaymentVerification = ({
             if (attempts < maxAttempts) {
               setTimeout(poll, 2000);
             } else {
-              setPaymentStatus('Registration delayed, please check again soon.');
+              setPaymentStatus('Your registration is being processed. Please check back in a minute.');
               setDelayedRegistration(false);
             }
           };
