@@ -20,6 +20,9 @@ export const pepeUnchainedV2 = defineChain({
     default: {
       http: ['https://rpc-pepu-v2-mainnet-0.t.conduit.xyz'],
     },
+    public: {
+      http: ['https://rpc-pepu-v2-mainnet-0.t.conduit.xyz'],
+    },
   },
   blockExplorers: {
     default: { name: 'PepuScan', url: 'https://pepuscan.com' },
@@ -32,20 +35,18 @@ const connectors = connectorsForWallets(
   [
     {
       groupName: 'Installed Wallets',
-      wallets: [
-        injectedWallet,
-      ],
+      wallets: [injectedWallet],
     },
     {
       groupName: 'Mobile',
-      wallets: [
-        walletConnectWallet,
-      ],
+      wallets: [walletConnectWallet],
     },
   ],
   {
     appName: 'Pepu Name Service',
     projectId: 'c4f79cc821944d9680842e34466bfbd9',
+    // Enable chain switching for all wallets
+    enableChainSwitching: true,
   }
 );
 
