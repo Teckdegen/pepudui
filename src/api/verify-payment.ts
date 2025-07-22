@@ -80,6 +80,8 @@ Time: ${new Date().toISOString()}`);
 export async function POST(request: Request) {
   const { wallet, name, txHash } = await request.json();
 
+  console.log('[verify-payment] Incoming:', { wallet, name, txHash });
+
   if (!wallet || !name) {
     return Response.json({ success: false, error: 'Wallet and name are required' });
   }
@@ -94,6 +96,7 @@ export async function POST(request: Request) {
       .maybeSingle();
 
     if (existingDomain) {
+      console.log('[verify-payment] Domain already taken:', name);
       return Response.json({ success: false, error: 'Domain is no longer available' });
     }
 
@@ -106,12 +109,14 @@ export async function POST(request: Request) {
       .maybeSingle();
 
     if (existingWallet) {
+      console.log('[verify-payment] Wallet already owns a domain:', wallet);
       return Response.json({ success: false, error: 'Wallet has already registered a domain' });
     }
 
     // If transaction hash is provided, verify it directly
     if (txHash) {
       const isValidPayment = await verifyTransaction(txHash, wallet);
+      console.log('[verify-payment] Payment verified:', isValidPayment);
       
       if (isValidPayment) {
         // Store in database
@@ -125,8 +130,8 @@ export async function POST(request: Request) {
           });
 
         if (insertError) {
-          console.error('Error storing domain:', insertError);
-          return Response.json({ success: false, error: 'Failed to store domain registration' });
+          console.error('[verify-payment] Error storing domain:', insertError);
+          return Response.json({ success: false, error: insertError.message || 'Failed to store domain registration' });
         }
 
         // Send Telegram notification
@@ -134,6 +139,7 @@ export async function POST(request: Request) {
 
         return Response.json({ success: true, name, txHash });
       } else {
+        console.log('[verify-payment] Invalid or insufficient payment transaction:', txHash);
         return Response.json({ success: false, error: 'Invalid or insufficient payment transaction' });
       }
     }
@@ -142,7 +148,7 @@ export async function POST(request: Request) {
     return Response.json({ success: false, error: 'Transaction hash required for verification' });
 
   } catch (error) {
-    console.error('Payment verification error:', error);
-    return Response.json({ success: false, error: 'Internal server error' });
+    console.error('[verify-payment] Payment verification error:', error);
+    return Response.json({ success: false, error: error?.message || 'Internal server error' });
   }
 }
