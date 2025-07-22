@@ -13,12 +13,10 @@ interface PaymentVerificationProps {
 }
 
 const TREASURY_WALLET: Address = '0x5359d161d3cdBCfA6C38A387b7F685ebe354368f';
-// Using a placeholder USDC contract address - this needs to be updated with the actual USDC contract on Pepe Unchained V2
 const USDC_CONTRACT: Address = '0x20fB684Bfc1aBAaD3AceC5712f2Aa30bd494dF74'; // Placeholder address
 const PEPU_USDC_AMOUNT = '5';
 const TARGET_CHAIN_ID = 97741;
 
-// USDC transfer ABI with proper typing
 const USDC_ABI = [
   {
     name: 'transfer',
@@ -56,34 +54,22 @@ export const PaymentVerification = ({
     hash,
   });
 
-  // Prevent modal from closing when clicking inside
   const handleModalClick = (e: React.MouseEvent) => {
     e.stopPropagation();
   };
 
   const sendPayment = async () => {
-    console.log('sendPayment called');
-    console.log('Connected:', isConnected);
-    console.log('Address:', address);
-    console.log('Chain ID:', chainId);
-    console.log('Target Chain ID:', TARGET_CHAIN_ID);
-
     if (!isConnected || !address) {
-      console.log('Wallet not connected');
       onError('Please connect your wallet');
       return;
     }
 
     setIsProcessing(true);
 
-    // Check if we're on the correct chain
     if (chainId !== TARGET_CHAIN_ID) {
       try {
-        console.log('Switching chain from', chainId, 'to', TARGET_CHAIN_ID);
         setPaymentStatus('Switching to Pepe Unchained V2 network...');
-        
         await switchChain({ chainId: TARGET_CHAIN_ID });
-        
         setTimeout(() => {
           executeTransaction();
         }, 1000);
@@ -101,7 +87,6 @@ export const PaymentVerification = ({
   };
 
   const executeTransaction = () => {
-    console.log('Executing USDC transfer transaction');
     setPaymentStatus('Preparing transaction...');
 
     if (!address) {
@@ -111,12 +96,6 @@ export const PaymentVerification = ({
     }
 
     try {
-      console.log('Transaction details:');
-      console.log('- Contract:', USDC_CONTRACT);
-      console.log('- To:', TREASURY_WALLET);
-      console.log('- Amount:', PEPU_USDC_AMOUNT, 'USDC');
-      console.log('- From:', address);
-      
       writeContract({
         address: USDC_CONTRACT,
         abi: USDC_ABI,
@@ -136,33 +115,24 @@ export const PaymentVerification = ({
     }
   };
 
-  // Handle transaction hash
   useEffect(() => {
     if (hash) {
-      console.log('Transaction hash received:', hash);
       setTxHash(hash);
       setPaymentStatus('Transaction sent! Waiting for confirmation...');
     }
   }, [hash]);
 
-  // Handle transaction confirmation
   useEffect(() => {
     if (isConfirmed && hash) {
-      console.log('Transaction confirmed, verifying payment...');
       setPaymentStatus('Payment confirmed! Registering domain...');
       verifyPayment(hash);
     }
   }, [isConfirmed, hash]);
 
-  // Handle transaction errors
   useEffect(() => {
     if (writeError) {
-      console.error('Write error:', writeError);
       setPaymentStatus('Transaction failed');
-      
       const errorMessage = writeError.message || 'Transaction failed';
-      console.log('Error message:', errorMessage);
-      
       if (errorMessage.includes('User rejected') || errorMessage.includes('user rejected')) {
         onError('Transaction was cancelled by user');
       } else if (errorMessage.includes('insufficient funds')) {
@@ -176,33 +146,22 @@ export const PaymentVerification = ({
 
   const verifyPayment = async (transactionHash: string) => {
     try {
-      console.log('Verifying payment with hash:', transactionHash);
-      
       const response = await fetch('/api/verify-payment', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          wallet: walletAddress,
-          name: domainName,
-          txHash: transactionHash,
-        }),
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ wallet: walletAddress, name: domainName, txHash: transactionHash }),
       });
 
       const result = await response.json();
-      console.log('Verification result:', result);
 
       if (result.success) {
         setPaymentStatus('Domain registered successfully! 🎉');
         onSuccess();
       } else {
-        console.error('Verification failed:', result.error);
         setPaymentStatus(`Registration failed: ${result.error}`);
         onError(result.error);
       }
     } catch (error) {
-      console.error('Payment verification error:', error);
       setPaymentStatus('Registration verification failed');
       onError('Registration verification failed');
     } finally {
@@ -248,7 +207,6 @@ export const PaymentVerification = ({
       className="relative w-full max-w-md max-h-[90vh] overflow-hidden bg-white rounded-3xl shadow-2xl flex flex-col"
       onClick={handleModalClick}
     >
-      {/* Header - Fixed */}
       <div className="relative bg-gradient-to-br from-yellow-50 to-orange-50 p-6 border-b border-yellow-200/60 flex-shrink-0">
         <div className="text-center">
           <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-3xl mb-4 shadow-xl relative overflow-hidden">
@@ -260,10 +218,8 @@ export const PaymentVerification = ({
         </div>
       </div>
 
-      {/* Scrollable Content */}
       <ScrollArea className="flex-grow">
         <div className="p-6 space-y-6">
-          {/* Domain display */}
           <div className="space-y-4 text-center">
             <p className="text-lg text-gray-600 font-medium">Secure your premium domain</p>
             <div className="relative group">
@@ -274,14 +230,12 @@ export const PaymentVerification = ({
                 </div>
               </div>
             </div>
-            
             <div className="inline-flex items-center justify-center bg-gradient-to-r from-yellow-500 to-orange-500 text-white px-8 py-4 rounded-2xl shadow-xl">
               <Shield className="w-5 h-5 mr-2" />
               <span className="text-xl font-bold">${PEPU_USDC_AMOUNT} USDC</span>
             </div>
           </div>
 
-          {/* Network warning */}
           {isWrongChain && (
             <div className="bg-gradient-to-r from-orange-100 to-red-100 border border-orange-300 text-orange-800 rounded-2xl p-5 text-center animate-fade-in">
               <div className="flex items-center justify-center mb-3">
@@ -293,7 +247,6 @@ export const PaymentVerification = ({
             </div>
           )}
 
-          {/* Status display */}
           {paymentStatus && (
             <div className={`relative overflow-hidden text-center p-5 rounded-2xl transition-all duration-500 animate-fade-in ${
               paymentStatus.includes('successfully') || paymentStatus.includes('confirmed') 
@@ -309,7 +262,6 @@ export const PaymentVerification = ({
             </div>
           )}
 
-          {/* Transaction hash */}
           {txHash && (
             <div className="bg-gray-50/90 backdrop-blur-sm border border-gray-200 rounded-2xl p-5 text-center animate-fade-in">
               <div className="flex items-center justify-center mb-3">
@@ -322,7 +274,6 @@ export const PaymentVerification = ({
             </div>
           )}
 
-          {/* Security footer */}
           <div className="text-center space-y-3 pt-2">
             <div className="flex items-center justify-center space-x-2 text-gray-600">
               <Shield className="w-5 h-5" />
@@ -335,7 +286,6 @@ export const PaymentVerification = ({
         </div>
       </ScrollArea>
 
-      {/* Fixed Footer with Action Button */}
       <div className="border-t border-gray-200 p-6 bg-white flex-shrink-0">
         <button
           onClick={sendPayment}
