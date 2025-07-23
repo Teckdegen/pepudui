@@ -159,44 +159,11 @@ export const PaymentVerification = ({
       const result = await response.json();
 
       if (result.success) {
-        if (result.delayed) {
-          setDelayedRegistration(true);
-          setPaymentStatus('Registering name...');
-          // Poll Supabase for up to 20 seconds
-          let attempts = 0;
-          const maxAttempts = 10;
-          const poll = async () => {
-            attempts++;
-            try {
-              const res = await fetch(`/api/check-domain?name=${encodeURIComponent(domainName)}`);
-              const data = await res.json();
-              if (data.exists) {
-                setPaymentStatus('Domain registered successfully! 🎉');
-                setDelayedRegistration(false);
-                onSuccess();
-                return;
-              }
-            } catch (e) {}
-            if (attempts < maxAttempts) {
-              setTimeout(poll, 2000);
-            } else {
-              setPaymentStatus('Your registration is being processed. Please check back in a minute.');
-              setDelayedRegistration(false);
-            }
-          };
-          poll();
-        } else {
-          setPaymentStatus('Domain registered successfully! 🎉');
-          onSuccess();
-        }
+        setPaymentStatus('Domain registered successfully! 🎉');
+        onSuccess();
       } else {
-        if (result.delayed) {
-          setDelayedRegistration(true);
-          setPaymentStatus('Registering name...');
-        } else {
-          setPaymentStatus(`Registration failed: ${result.error}`);
-          onError(result.error);
-        }
+        setPaymentStatus(`Registration failed: ${result.error}`);
+        onError(result.error);
       }
     } catch (error) {
       setPaymentStatus('Registration verification failed');
