@@ -1,4 +1,4 @@
-import { supabase } from '@/integrations/supabase/client';
+import { insertDomain } from '@/integrations/supabase/insertDomain';
 
 const TREASURY_WALLET = '0x3a5149Ae34B99087fF51EC374EeC371623789Cd0'; // Fixed - now 42 characters
 const PEPU_RPC_URL = 'https://eth-sepolia.public.blastapi.io';
@@ -68,26 +68,6 @@ async function verifyTransaction(txHash: string, fromAddress: string): Promise<b
   }
 }
 
-async function sendTelegramNotification(wallet: string, name: string, txHash: string) {
-  const chatId = '6213503516';
-  const botToken = '8186054883:AAGRyN-t-VHRUZcN7I-ZmsVUnMxj5EQ_9EA';
-  const message = `✅ New domain registered!\nDomain: ${name}\nOwner: ${wallet}\nTransaction: ${txHash}\nTime: ${new Date().toISOString()}`;
-  const url = `https://api.telegram.org/bot${botToken}/sendMessage`;
-  try {
-    await fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        chat_id: chatId,
-        text: message,
-        parse_mode: 'Markdown',
-      }),
-    });
-  } catch (err) {
-    console.error('[verify-payment] Telegram notification failed:', err);
-  }
-}
-
 export async function POST(request: Request) {
   const { wallet, name, txHash } = await request.json();
 
@@ -96,38 +76,27 @@ export async function POST(request: Request) {
   }
 
   // Blockchain verification
-  const isValid = await verifyTransaction(txHash, wallet);
-  if (!isValid) {
-    return Response.json({ success: false, error: 'Blockchain payment verification failed' });
-  }
-
-  // Log domain registration step
-  console.log('Domain registering...');
+  const paymentVerified = await verifyTransaction(txHash, wallet);
 
   // Prepare timestamps
   const now = new Date();
   const expiry = new Date(now.getTime() + 365 * 24 * 60 * 60 * 1000);
 
-  // Insert into Supabase with all required fields
-  const { error: insertError } = await supabase
-    .from('domains')
-    .insert({
-      name,
-      owner: wallet.toLowerCase(),
-      paid: true,
-      transaction_hash: txHash,
-      created_at: now.toISOString(),
-      updated_at: now.toISOString(),
-      expiry: expiry.toISOString(),
-    });
+  // Use insertDomain utility
+  const result = await insertDomain({
+    name,
+    owner: wallet.toLowerCase(),
+    paid: true,
+    transaction_hash: txHash,
+    created_at: now.toISOString(),
+    updated_at: now.toISOString(),
+    expiry: expiry.toISOString(),
+    paymentVerified,
+  });
 
-  if (insertError) {
-    console.error('[verify-payment] Insert failed:', insertError);
-    return Response.json({ success: false, error: insertError.message || 'Failed to store domain registration' });
+  if (!result.success) {
+    return Response.json({ success: false, error: result.error });
   }
-
-  // Send Telegram notification
-  await sendTelegramNotification(wallet, name, txHash);
 
   return Response.json({ success: true, name, txHash });
 }
