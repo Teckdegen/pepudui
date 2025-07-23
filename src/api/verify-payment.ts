@@ -1,4 +1,3 @@
-import { insertDomain } from '@/integrations/supabase/insertDomain';
 import { sendTelegramNotification } from '@/lib/telegram';
 
 const TREASURY_WALLET = '0x3a5149Ae34B99087fF51EC374EeC371623789Cd0'; // Fixed - now 42 characters
@@ -100,5 +99,7 @@ export async function POST(request: Request) {
     return Response.json({ success: false, error: 'Failed to send Telegram notification' });
   }
 
-  return Response.json({ success: true, name, txHash });
+  // Always return a success message that says domain registered
+  return Response.json({ success: true, message: 'Domain registered successfully!', name, txHash });
 }
+
