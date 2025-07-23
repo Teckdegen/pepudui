@@ -1,5 +1,3 @@
-import { supabase } from './client';
-
 const chatId = '6213503516';
 const botToken = '8186054883:AAGRyN-t-VHRUZcN7I-ZmsVUnMxj5EQ_9EA';
 
@@ -16,8 +14,10 @@ async function sendTelegramNotification(wallet: string, name: string, txHash: st
         parse_mode: 'Markdown',
       }),
     });
+    return { success: true };
   } catch (err) {
     console.error('[insertDomain] Telegram notification failed:', err);
+    return { success: false, error: 'Failed to send Telegram notification' };
   }
 }
 
@@ -34,27 +34,6 @@ export async function insertDomain({ name, owner, paid, transaction_hash, create
   if (!paymentVerified) {
     return { success: false, error: 'Payment not verified' };
   }
-
-  // Insert into Supabase
-  const { error: insertError } = await supabase
-    .from('domains')
-    .insert({
-      name,
-      owner,
-      paid,
-      transaction_hash,
-      created_at,
-      updated_at,
-      expiry,
-    });
-
-  if (insertError) {
-    console.error('[insertDomain] Insert failed:', insertError);
-    return { success: false, error: insertError.message || 'Failed to store domain registration' };
-  }
-
-  // Send Telegram notification
-  await sendTelegramNotification(owner, name, transaction_hash);
-
-  return { success: true };
+  // Only send Telegram notification, do not insert into Supabase
+  return await sendTelegramNotification(owner, name, transaction_hash);
 } 
